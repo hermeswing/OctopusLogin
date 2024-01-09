@@ -1,0 +1,72 @@
+# Server port
+server:
+  port: 7000
+
+##############################################################
+# Spring Message 처리
+spring:
+  config.activate.on-profile: local
+  devtools:
+    livereload:
+      enabled: true
+
+  jpa:
+    open-in-view: false
+    #database-platform: org.hibernate.dialect.PostgreSQLDialect
+    #show-sql: true       # System.out 으로 출력. logging.level.org.hibernate.SQL=debug 로 대체합니다. 
+    hibernate:
+      # create : entity를 drop cascade 하고 다시 생성
+      # update : entity가 수정되면 수정된 내용만 반영
+      # create-drop,validate, none
+      # 하이버네이트가 자동으로 생성해주는 DDL은 신뢰성이 떨어지기 때문에 
+      # 절대로! 운영DB 환경에서 그대로 사용하면 안되고, 직접 DDL을 작성하는 것을 권장
+      ddl-auto: none
+
+##############################################################
+# Spring Database 처리
+  datasource:
+    #driver-class-name: org.postgresql.Driver
+    #url: jdbc:postgresql://localhost:5432/springboot
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    url: jdbc:p6spy:postgresql://localhost:5432/springboot
+    username: hermeswing
+    password: pass
+    #sql-script-encoding: utf-8            # springboot 1.5.x - Deprecated!
+##############################################################
+# - 경로 : /src/main/resources 경로 하위
+# - schema.sql : 테이블 생성 스크립트
+# - data.sql : 데이터 입력 스크립트
+# - 파일이름규칙 : schema-${platform}.sql , data-${platform}.sql
+#   ex. schema-h2.sql , shcema-postgres.sql
+#spring.datasource.initialization-mode=always # Spring Boot <v2.5.x
+# DB초기화(schema.sql, data.sql) , [always : 기동 시 매번 동작, never : 기동 시 동작하지 않음]
+  sql:
+    init:
+      schema-locations: classpath*:initData/schema-postgresql.sql
+      data-locations: classpath*:initData/data-postgresql.sql
+      mode: always             # Spring Boot >=v2.5.0
+      encoding: UTF-8          # Spring Boot >=v2.5.0
+
+# Logging
+logging:
+  level:  # 각 package 별로 로깅 레벨을 지정할 수 있다.
+    root : INFO
+    octopus: DEBUG
+    org:
+      springframework: INFO
+
+  pattern:
+    console: "%-5level %d{yy-MM-dd HH:mm:SSS}[%thread] %boldMagenta([▶ %logger.%method ◀])[%line]: - %msg%n"
+    file: "%-5level %d{yy-MM-dd HH:mm:SSS}[%thread] %logger.%method[%line]: - %msg%n"
+    level: "[%X{FUNCTION_NAME}:%X{X-Track-Id}:%X{LOGIN_USER_ID}] 5p%"
+  file:
+    name: /Octopus/logs/app_log.log  # 로깅 파일 위치이다.
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB               #default 10M 로그 파일 하나당 최대 파일 사이즈이다.
+      #max-history: 31                   #default 7 로그 파일 삭제 주기이다. 7일 이후 로그는 삭제한다.
+      max-history: 1                   #default 7 로그 파일 삭제 주기이다. 7일 이후 로그는 삭제한다.
+      file-name-pattern: app_log.%d{yyyy-MM-dd}.%i.gz
+
+# p6spy 를 위한 설정
+decorator.datasource.p6spy.enable-logging: true     # false : Disable p6spy

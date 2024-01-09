@@ -1,0 +1,84 @@
+
+##############################################################
+# -Dspring.profiles.active=local
+# Redis 옵션들
+# https://zetawiki.com/wiki/%EC%8A%A4%ED%94%84%EB%A7%81_REDIS_%ED%94%84%EB%A1%9C%ED%8D%BC%ED%8B%B0
+# 커넥션 팩토리에 사용되는 데이터베이스 인덱스
+#spring.redis.database
+# 레디스 서버 호스트
+spring:
+  profiles:
+    include: local
+    
+  redis:
+    host: localhost
+    lettuce:
+      pool:
+        enabled: true
+        max-active: 8       # pool에 할당될 수 있는 커넥션 최대수 (음수로 하면 무제한)
+        max-idle: 8         # 풀에서 관리하는 idle 커넥션의 쵀소수 대상 (양수일 때만 유효)
+        max-wait: -1        # pool이 바닥났을 때 예외 발생 전, 커넥션 할당 차단 최대 시간(단위 밀리세컨드, 음수는 무제한 차단)
+        min-idle: 0         # 풀에서 관리하는 idle 커넥션의 쵀소수 대상 (양수일 때만 유효)
+    port: 6379              # 레디스 서버 포트
+# 레디스 서버 이름
+#spring.redis.sentinel.master
+# 호스트: 포트 쌍 목록 (콤마로 구분)
+#spring.redis.sentinel.nodes=
+# 커넥션 타임아웃 (단위 밀리세컨드)
+    timeout: 0
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: xxx
+    password: xxx
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+##############################################################
+# Server 설정
+server:
+  servlet:
+    context-path: /
+    encoding:
+      enabled: true
+      charset: UTF-8
+      force: true
+    session:
+      timeout: 120                              # 기본단위 : 초
+      
+  tomcat:
+    uri-encoding: UTF-8                         # Spring Default : UTF-8
+    
+
+##############################################################
+# Logging
+logging:
+  config: classpath:logback-local.xml
+  level:
+    root: info
+    org:
+      hibernate:
+        SQL: debug
+        type:
+          descriptor:
+            sql: trace
+  pattern:
+    console: "%-5level %d{yy-MM-dd HH:mm:SSS}[%thread] %logger[%method:%line] - %msg%n"
+    file: "%-5level %d{yy-MM-dd HH:mm:SSS}[%thread] %logger[%method:%line] - %msg%n"
+  file:
+    name: C:/greenhorn/logs/logback-dev#2.log
+  logback:
+    rollingpolicy:
+      max-file-size: 1MB                #default 10M
+      max-history: 31                   #default 7
+      file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz
+##############################################################
+# 사용자 설정
+custom:
+  jwt:
+    secretKey: MySecretKey1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ
