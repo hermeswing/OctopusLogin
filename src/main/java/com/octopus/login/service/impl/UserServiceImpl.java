@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.octopus.entity.TUserM;
@@ -21,8 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserServiceImpl implements UsersService {
     
-    private final UserRepository        userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UserRepository  userRepository;
+    private final PasswordEncoder passwordEncoder;
     
     @Override
     public UserDTO findUser(String email) {
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UsersService {
         TUserM users = Optional.ofNullable(userRepository.findByEmail(email))
                 .orElseThrow(() -> new BadCredentialsException("이메일이나 비밀번호를 확인해주세요."));
         
-        if (bCryptPasswordEncoder.matches(password, users.getPassword()) == false) {
+        if (passwordEncoder.matches(password, users.getPassword()) == false) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
         

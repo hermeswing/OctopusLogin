@@ -87,7 +87,10 @@ logging:
       max-history: 31                   #default 7
       file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz
 ##############################################################
-# 사용자 설정
+# JWT 사용자 설정
+# secretKey는 SignatureAlgorithm.HS512 알고리즘을 사용할 예정이기 때문에 512자 이상의 값으로 설정
 custom:
   jwt:
-    secretKey: MySecretKey1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    header: Authorization
+    secretKey: MySecretKeyABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDE
+    token-validity-in-seconds: 86400
