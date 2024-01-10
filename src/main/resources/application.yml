@@ -40,6 +40,15 @@ spring:
             enable: true
             required: true
 ##############################################################
+# Spring Security
+# implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+# implementation 'org.springframework.boot:spring-boot-starter-security'
+  security:
+    user:
+      name: user
+      password: 1111                         # Spring Security Default password 변경
+
+##############################################################
 # Server 설정
 server:
   servlet:
