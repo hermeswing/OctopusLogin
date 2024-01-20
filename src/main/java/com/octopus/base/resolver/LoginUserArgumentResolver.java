@@ -9,12 +9,12 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import com.octopus.base.annotation.LoginUser;
+import com.octopus.login.dto.PrincipalDetails;
+import com.octopus.login.service.PrincipalDetailsService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import octopus.base.anotation.LoginUser;
-import octopus.base.model.UserSessionDto;
-import octopus.basic.user.dto.UserDto;
-import octopus.basic.user.service.UserService;
 
 /**
  * <pre>
@@ -26,8 +26,8 @@ import octopus.basic.user.service.UserService;
 @Component
 public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver {
     
-    private final HttpSession session;
-    private final UserService userService;
+    private final HttpSession             session;
+    private final PrincipalDetailsService userService;
     
     /**
      * Parameter가 @LoginUser Annotation이고, UserSessionDto Type이면..
@@ -35,7 +35,7 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         boolean isLoginUserAnnotation = parameter.getParameterAnnotation(LoginUser.class) != null;
-        boolean isUserClass           = UserSessionDto.class.equals(parameter.getParameterType());
+        boolean isUserClass           = PrincipalDetails.class.equals(parameter.getParameterType());
         
         if (isLoginUserAnnotation && isUserClass) {
             return true;
@@ -59,19 +59,17 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
         // UserSessionDto userDto = (UserSessionDto) authentication.getPrincipal();
         
         boolean isLoginUserAnnotation = parameter.getParameterAnnotation(LoginUser.class) != null;
-        boolean isUserClass           = UserSessionDto.class.equals(parameter.getParameterType());
+        boolean isUserClass           = PrincipalDetails.class.equals(parameter.getParameterType());
         
         if (isLoginUserAnnotation && isUserClass) {
             // TODO Session 객체가 없음. Redis 에서 사용자의 정보를 가져와야 할 지도..
             // TODO 사용자 정보를 Return 한다.
             // UserSessionDto userDto = (UserSessionDto) session.getAttribute("user");
-            UserDto userDto = userService.findById("admin");
+            PrincipalDetails userDetail = userService.loadUserByUsername("admin");
             
-            log.debug("userDto :: {}", userDto);
+            log.debug("userDetail :: {}", userDetail);
             
-            UserSessionDto sessionDto = new UserSessionDto(userDto);
-            
-            return sessionDto;
+            return userDetail;
         } else {
             return null;
         }

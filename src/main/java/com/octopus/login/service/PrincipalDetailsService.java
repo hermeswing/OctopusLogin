@@ -24,7 +24,7 @@ public class PrincipalDetailsService implements UserDetailsService {
         Users findUser = authRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Can't find user with this email. -> " + email));
         
-        log.debug("findUser :: {}", findUser);
+        log.debug("findByEmail :: {}", findUser);
         
         if (findUser != null) {
             PrincipalDetails userDetails = new PrincipalDetails(findUser);
