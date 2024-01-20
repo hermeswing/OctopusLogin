@@ -1,12 +1,12 @@
-package com.octopus.config;
+package com.octopus.base.config;
 
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.octopus.utils.JwtFilter;
-import com.octopus.utils.TokenProvider;
+import com.octopus.base.security.filter.JwtFilter;
+import com.octopus.base.security.provider.JwtTokenProvider;
 
 /**
  * <pre>
@@ -18,10 +18,10 @@ import com.octopus.utils.TokenProvider;
  * @author jypark
  */
 public class JwtSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
-    private final TokenProvider tokenProvider;
+    private final JwtTokenProvider tokenProvider;
     
     // TokenProvider를 주입
-    public JwtSecurityConfig(TokenProvider tokenProvider) {
+    public JwtSecurityConfig(JwtTokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
     }
     

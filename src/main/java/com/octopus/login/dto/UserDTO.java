@@ -1,8 +1,8 @@
 package com.octopus.login.dto;
 
+import com.octopus.base.enumeration.UserRole;
 import com.octopus.base.model.BaseDTO;
-import com.octopus.entity.TUserM;
-import com.octopus.enumeration.UserRole;
+import com.octopus.entity.Users;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,20 +27,12 @@ public class UserDTO extends BaseDTO {
     private String   password;
     private UserRole userRole;
     
-    @Builder
-    private UserDTO(Long id, String password, UserRole userRole, String email) {
-        this.id       = id;
-        this.password = password;
-        this.userRole = userRole;
-        this.email    = email;
-    }
-    
-    public TUserM toEntity() {
-        return TUserM.builder().userId(userId).userNm(userNm).email(email).password(password).userRole(userRole)
+    public Users toEntity() {
+        return Users.builder().userId(userId).userNm(userNm).email(email).password(password).userRole(userRole)
                 .crtId(getCrtId()).mdfId(getMdfId()).build();
     }
     
-    public UserDTO(TUserM user) {
+    public UserDTO(Users user) {
         this.id     = user.getId();
         this.userId = user.getUserId();
         this.userNm = user.getUserNm();

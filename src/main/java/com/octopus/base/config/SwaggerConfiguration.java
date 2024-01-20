@@ -1,4 +1,4 @@
-package com.octopus.config;
+package com.octopus.base.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

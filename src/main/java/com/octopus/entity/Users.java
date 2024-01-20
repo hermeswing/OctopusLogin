@@ -2,19 +2,25 @@ package com.octopus.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Proxy;
+import org.springframework.data.domain.Persistable;
 import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.octopus.base.enumeration.UserRole;
 import com.octopus.base.model.BaseEntity;
-import com.octopus.enumeration.UserRole;
 import com.octopus.login.dto.UserDTO;
 
 import lombok.AccessLevel;
@@ -36,9 +42,30 @@ import lombok.ToString;
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" }) // Post Entity에서 User와의 관계를 Json으로 변환시 오류 방지를 위한 코드
 @Proxy(lazy = false)
 @Entity // jpa entity임을 선언. 실제 DB의 테이블과 매칭될 Class
-@Table(name = "T_USER_M")
-public class TUserM extends BaseEntity {
+@Table(name = "USERS")
+public class Users extends BaseEntity implements Persistable<Long> {
     private static final long serialVersionUID = 1L;
+    
+    /**
+     * <pre>
+     * save 시 Select 날리는 것을 방지
+     * 특정 필드를 컬럼에 매핑하지 않음(매핑 무시), 
+     * 주로 메모리상에서만 임시로 어떤 값을 보관하고 싶을 때 사용
+     * </pre>
+     */
+    @Transient
+    private boolean isNew = true;
+    
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+    
+    @PrePersist
+    @PostLoad
+    void markNotNew() {
+        this.isNew = false;
+    }
     
     @Id // PK 필드임
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,10 +84,11 @@ public class TUserM extends BaseEntity {
     private String password; // 비밀번호
     
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private UserRole userRole;
     
     @Builder
-    public TUserM(Long id, String userId, String userNm, String email, String password, UserRole userRole,
+    public Users(Long id, String userId, String userNm, String email, String password, UserRole userRole,
             String crtId, String mdfId) {
         Assert.hasText(userId, "userId must not be empty");
         Assert.hasText(email, "email must not be empty");
@@ -72,10 +100,25 @@ public class TUserM extends BaseEntity {
         this.userNm   = userNm;
         this.email    = email;
         this.password = password;
-        this.userRole = userRole;
+        this.userRole = UserRole.USER;
         
         super.crtId = crtId;
         super.mdfId = mdfId;
+    }
+    
+    public static Users createEntiry(UserDTO userDTO, String encodedPassword) {
+        Users user = new Users();
+        user.id       = userDTO.getId();
+        user.userId   = userDTO.getUserId();
+        user.userNm   = userDTO.getUserNm();
+        user.email    = userDTO.getEmail();
+        user.password = encodedPassword;
+        user.userRole = UserRole.USER;
+        
+        user.crtId = userDTO.getCrtId();
+        user.mdfId = userDTO.getMdfId();
+        
+        return user;
     }
     
     /**
