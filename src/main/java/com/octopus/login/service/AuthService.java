@@ -29,7 +29,11 @@ public class AuthService {
     
     private final String SERVER = "Server";
     
-    // 로그인: 인증 정보 저장 및 비어 토큰 발급
+    /**
+     * <pre>
+     * 로그인: 인증 정보 저장 및 비어 토큰 발급
+     * </pre>
+     */
     @Transactional
     public AuthDTO.TokenDto login(AuthDTO.LoginDto loginDto) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(),
@@ -45,7 +49,7 @@ public class AuthService {
     // AT가 만료일자만 초과한 유효한 토큰인지 검사
     public boolean validate(String requestAccessTokenInHeader) {
         String requestAccessToken = resolveToken(requestAccessTokenInHeader);
-        //return jwtTokenProvider.validateAccessTokenOnlyExpired(requestAccessToken); // true = 재발급
+        // return jwtTokenProvider.validateAccessTokenOnlyExpired(requestAccessToken); // true = 재발급
         return jwtTokenProvider.isTokenExpired(requestAccessToken); // true = 재발급
     }
     

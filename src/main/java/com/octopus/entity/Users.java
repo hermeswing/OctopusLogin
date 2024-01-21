@@ -11,6 +11,8 @@ import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -42,7 +44,7 @@ import lombok.ToString;
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" }) // Post Entity에서 User와의 관계를 Json으로 변환시 오류 방지를 위한 코드
 @Proxy(lazy = false)
 @Entity // jpa entity임을 선언. 실제 DB의 테이블과 매칭될 Class
-@Table(name = "USERS")
+@Table(name = "USERS", uniqueConstraints = { @UniqueConstraint(columnNames = "email") })
 public class Users extends BaseEntity implements Persistable<Long> {
     private static final long serialVersionUID = 1L;
     
@@ -67,16 +69,19 @@ public class Users extends BaseEntity implements Persistable<Long> {
         this.isNew = false;
     }
     
-    @Id // PK 필드임
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // Comment ID
     
+    @NotBlank
     @Column(nullable = false)
     private String userId; // 사용자 ID
     
+    @NotBlank
     @Column(nullable = false)
     private String userNm; // 사용자명
-    
+
+    @Id // PK 필드임
+    @NotBlank
     @Column(nullable = false)
     private String email; // 이메일주소
     

@@ -15,7 +15,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.octopus.base.config.WebConst;
+import com.octopus.base.WebConst;
 import com.octopus.login.dto.AuthDTO;
 import com.octopus.login.dto.PrincipalDetails;
 import com.octopus.login.service.PrincipalDetailsService;

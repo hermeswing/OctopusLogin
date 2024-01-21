@@ -18,6 +18,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.InvalidResultSetAccessException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -37,6 +38,21 @@ public class ExceptionAdvice {
     
     private final ResponseManager       responseService;
     private final MessageSourceAccessor messageSourceAccessor;
+    
+    /**
+     * @Valid 에 의해 발생되는 Exception 메시지 처리
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public CommonResult internalAuthenticationServiceException(InternalAuthenticationServiceException e) {
+        
+        log.debug("e.getBindingResult() :: {}", e.getMessage());
+        //log.debug("e.getBindingResult() :: {}", NonUniqueResultException);
+        
+        return responseService.getFailResult(-1, getMessage("중복된 데이터가 존재합니다.."));
+    }
     
     /**
      * @Valid 에 의해 발생되는 Exception 메시지 처리
@@ -104,8 +120,8 @@ public class ExceptionAdvice {
     
     @ExceptionHandler(DataAccessException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    protected CommonResult dataAccessException(HttpServletRequest request, DataAccessException e) {
-        Map<String, Object> result = getErrMsg(e);
+    protected CommonResult dataAccessException(HttpServletRequest request, DataAccessException dae) {
+        Map<String, Object> result = getErrMsg(dae);
         log.info("[ExceptionAdvice >> dataAccessException] result :: {}", result);
         
         return responseService.getFailResult(Integer.parseInt(String.valueOf(result.get("errCode"))),
@@ -162,7 +178,8 @@ public class ExceptionAdvice {
             // 고유성 제한 위반과 같은 데이터 삽입 또는 업데이트시 무결성 위반
             // "등록된 데이터가 컬럼의 속성과 다릅니다. (길이, 속성, 필수입력항목 등..)";
             errCode = -1;
-            errMsg  = getMessage("dataIntegrityViolationException"); // "등록된 데이터가 컬럼의 속성과 다릅니다. (길이, 속성, 필수입력항목 등..)";
+            //errMsg  = getMessage("dataIntegrityViolationException"); // "등록된 데이터가 컬럼의 속성과 다릅니다. (길이, 속성, 필수입력항목 등..)";
+            errMsg  = getMessage("duplicateKeyException"); // "중복된 데이터가 존재합니다.";
         } else if (ex instanceof DataAccessResourceFailureException) {
             // 데이터 액세스 리소스가 완전히 실패했습니다 (예 : 데이터베이스에 연결할 수 없음)
             errCode = -1;

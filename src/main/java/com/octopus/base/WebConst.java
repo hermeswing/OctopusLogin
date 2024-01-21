@@ -1,4 +1,4 @@
-package com.octopus.base.config;
+package com.octopus.base;
 
 public interface WebConst {
     

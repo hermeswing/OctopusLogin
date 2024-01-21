@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.octopus.base.config.WebConst;
+import com.octopus.base.WebConst;
 import com.octopus.base.security.provider.JwtTokenProvider;
 import com.octopus.login.dto.AuthDTO;
 import com.octopus.login.dto.UserDTO;

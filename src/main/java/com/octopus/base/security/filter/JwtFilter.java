@@ -12,7 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.octopus.base.config.WebConst;
+import com.octopus.base.WebConst;
 import com.octopus.base.security.provider.JwtTokenProvider;
 
 import lombok.extern.slf4j.Slf4j;
@@ -86,6 +86,7 @@ public class JwtFilter extends OncePerRequestFilter {
             
             return bearerToken.substring(7);
         }
+        
         return null;
     }
 }

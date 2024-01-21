@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
  * 참조 : https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter/
  * 
  * 출처 : https://velog.io/@u-nij/JWT-JWT-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0-1-Spring-Security
+ * 출처 : https://www.bezkoder.com/spring-boot-jwt-authentication/
  * 출처 : https://velog.io/@gale4739/Spring-Security-%EC%A0%81%EC%9A%A9
  * 출처: https://velog.io/@soyeon207/JWT-%EC%8B%A4%EC%8A%B5
  * https://github.com/soyeon207/blog_example/blob/master/jwt-security-server/src/main/java/velog/soyeon/jwt/config/JwtAuthenticationFilter.java
