@@ -68,7 +68,8 @@ public class Users extends BaseEntity implements Persistable<Long> {
     void markNotNew() {
         this.isNew = false;
     }
-    
+
+    @Id // PK 필드임
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // Comment ID
     
@@ -80,7 +81,7 @@ public class Users extends BaseEntity implements Persistable<Long> {
     @Column(nullable = false)
     private String userNm; // 사용자명
 
-    @Id // PK 필드임
+    //@Id // PK 필드임
     @NotBlank
     @Column(nullable = false)
     private String email; // 이메일주소

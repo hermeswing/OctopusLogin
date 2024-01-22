@@ -57,7 +57,7 @@ public class P6SpySqlFormatter implements MessageFormattingStrategy {
             String trace = stackTraceElement.toString();
             
             // trace 항목을 보고 내게 맞는 것만 필터
-            if(trace.startsWith("octopus.backend")) {
+            if(trace.startsWith("com.octopus")) {
                 callStack.push(trace);
             }
         }
