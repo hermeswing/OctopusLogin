@@ -8,5 +8,5 @@ import com.octopus.entity.Users;
 
 // @Repository : JpaRepository를 사용하면 @Repository를 사용하지 않아도 됨.
 public interface AuthRepository extends JpaRepository<Users, String> {
-    Optional<Users> findByEmail(String email);
+    Optional<Users> findByUserId(String userId);
 }

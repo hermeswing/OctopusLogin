@@ -10,4 +10,4 @@ COMMENT on column USERS.MDF_ID is '수정자ID';
 COMMENT on column USERS.MDF_DT is '수정일시';
 
 INSERT INTO USERS(USER_ID, USER_NM, PASSWORD, EMAIL, USER_ROLE, CRT_ID, CRT_DT, MDF_ID, MDF_DT) VALUES ('admin', '어드민', '$2a$10$nMLiZitxDc62fnJ21zpwC.d/lKd73SswYPhRYCz1kF8S4/zKX3uiK', 'admin@naver.com', 'ADMIN', 'admin', NOW(), 'admin', NOW());
-INSERT INTO USERS(USER_ID, USER_NM, PASSWORD, EMAIL, USER_ROLE, CRT_ID, CRT_DT, MDF_ID, MDF_DT) VALUES ('hong', '홍길동', '$2a$10$nMLiZitxDc62fnJ21zpwC.d/lKd73SswYPhRYCz1kF8S4/zKX3uiK', 'test@naver.com', 'USER', 'admin', NOW(), 'admin', NOW());
+INSERT INTO USERS(USER_ID, USER_NM, PASSWORD, EMAIL, USER_ROLE, CRT_ID, CRT_DT, MDF_ID, MDF_DT) VALUES ('hong', '홍길동', '$2a$10$nMLiZitxDc62fnJ21zpwC.d/lKd73SswYPhRYCz1kF8S4/zKX3uiK', 'hong@naver.com', 'USER', 'admin', NOW(), 'admin', NOW());

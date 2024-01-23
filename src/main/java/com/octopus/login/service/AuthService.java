@@ -35,7 +35,7 @@ public class AuthService {
     @Transactional
     public AuthDTO.TokenDto login(AuthDTO.LoginDto loginDto) {
         log.debug("★★★★★★★★★★★★★★★★★★ [login] ★★★★★★★★★★★★★★★★★");
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(),
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getUserId(),
                 loginDto.getPassword());
         log.debug("<< 1 >>");
         Authentication authentication = authenticationManagerBuilder.getObject()
