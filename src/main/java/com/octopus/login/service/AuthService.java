@@ -1,8 +1,9 @@
 package com.octopus.login.service;
 
-import java.util.Date;
-import java.util.stream.Collectors;
-
+import com.octopus.base.security.provider.JwtTokenProvider;
+import com.octopus.login.dto.AuthDTO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -11,11 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.octopus.base.security.provider.JwtTokenProvider;
-import com.octopus.login.dto.AuthDTO;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Date;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -36,13 +34,15 @@ public class AuthService {
      */
     @Transactional
     public AuthDTO.TokenDto login(AuthDTO.LoginDto loginDto) {
+        log.debug("★★★★★★★★★★★★★★★★★★ [login] ★★★★★★★★★★★★★★★★★");
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(),
                 loginDto.getPassword());
-        
+        log.debug("<< 1 >>");
         Authentication authentication = authenticationManagerBuilder.getObject()
                 .authenticate(authenticationToken);
+        log.debug("<< 2 >>");
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        
+        log.debug("<< 3 >>");
         return generateToken(SERVER, authentication.getName(), getAuthorities(authentication));
     }
     

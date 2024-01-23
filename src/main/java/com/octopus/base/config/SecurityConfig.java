@@ -29,12 +29,12 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  *
  * TokenProvider, JwtFilter를 SecurityConfig에 적용할 떄 사용
  * Spring Security 5.70 이후부터 WebSecurityConfigurerAdapter를 상속 받는 방식은 deprecated
- * 참조 : https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter/
+ * 참조 : <a href="https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter/">...</a>
  *
- * 출처 : https://velog.io/@u-nij/JWT-JWT-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0-1-Spring-Security
- * 출처 : https://www.bezkoder.com/spring-boot-jwt-authentication/
- * 출처 : https://velog.io/@gale4739/Spring-Security-%EC%A0%81%EC%9A%A9
- * 출처: https://velog.io/@soyeon207/JWT-%EC%8B%A4%EC%8A%B5
+ * 출처 : <a href="https://velog.io/@u-nij/JWT-JWT-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0-1-Spring-Security">...</a>
+ * 출처 : <a href="https://www.bezkoder.com/spring-boot-jwt-authentication/">...</a>
+ * 출처 : <a href="https://velog.io/@gale4739/Spring-Security-%EC%A0%81%EC%9A%A9">...</a>
+ * 출처: <a href="https://velog.io/@soyeon207/JWT-%EC%8B%A4%EC%8A%B5">...</a>
  * https://github.com/soyeon207/blog_example/blob/master/jwt-security-server/src/main/java/velog/soyeon/jwt/config/JwtAuthenticationFilter.java
  * </pre>
  *
@@ -51,10 +51,11 @@ public class SecurityConfig {
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     // TokenProvider,JwtAuthenticationEntryPoint,JwtAccessDeniedHandler 의존성 주입
-    public SecurityConfig(
+    public SecurityConfig (
             JwtTokenProvider tokenProvider,
             JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
             JwtAccessDeniedHandler jwtAccessDeniedHandler) {
+        log.debug("★★★★★★★★★★★★★★★★★★ [SecurityConfig] 생성자 생성. ★★★★★★★★★★★★★★★★★");
         this.tokenProvider = tokenProvider;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
@@ -69,7 +70,7 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        log.debug("★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★");
+        log.debug("★★★★★★★★★★★★★★★★★★ [SecurityConfig.webSecurityCustomizer] ★★★★★★★★★★★★★★★★★");
         // ACL(Access Control List, 접근 제어 목록)의 예외 URL 설정
         return (web) -> web.ignoring()
                 // Spring Security should completely ignore URLs starting with /resources/
@@ -79,7 +80,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        log.debug("★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★");
+        log.debug("★★★★★★★★★★★★★★★★★★ [SecurityConfig.securityFilterChain] ★★★★★★★★★★★★★★★★★");
 
         http
                 .csrf().disable() // 토큰을 사용하기 때문에 csrf 설정 disable

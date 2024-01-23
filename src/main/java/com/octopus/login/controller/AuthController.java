@@ -45,6 +45,7 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthDTO.LoginDto loginDto, HttpServletResponse response) {
+        log.debug("★★★★★★★★★★★★★★★★★★ [/login] ★★★★★★★★★★★★★★★★★");
         // User 등록 및 Refresh Token 저장
         AuthDTO.TokenDto tokenDto = authService.login(loginDto);
         

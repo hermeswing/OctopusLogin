@@ -18,13 +18,14 @@ public class PrincipalDetailsService implements UserDetailsService {
     private final AuthRepository authRepository;
 
     @Override
-    public PrincipalDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Users findUser = authRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Can't find user with this email. -> " + email));
+    public PrincipalDetails loadUserByUsername( String userId ) throws UsernameNotFoundException {
+        log.debug( "★★★★★★★★★★★★★★★★★" );
+        Users findUser = authRepository.findById( userId )
+                .orElseThrow( () -> new UsernameNotFoundException( "Can't find user with this User ID. -> " + userId ) );
 
-        log.debug("findByEmail :: {}", findUser);
+        log.debug( "findByEmail :: {}", findUser );
 
-        return new PrincipalDetails(findUser);
+        return new PrincipalDetails( findUser );
     }
 
 }
