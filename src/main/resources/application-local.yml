@@ -32,6 +32,7 @@ spring:
       
 ##############################################################
 # Spring Database 처리
+# p6Spy JDBC 설정
   datasource:
     #driver-class-name: org.postgresql.Driver
     #url: jdbc:postgresql://localhost:5432/springboot
