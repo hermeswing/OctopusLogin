@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.octopus.entity.Users;
 import com.octopus.login.dto.UserDTO;
-import com.octopus.login.repository.AuthRepository;
+import com.octopus.login.repository.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +24,26 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 public class UserService {
     private final PasswordEncoder passwordEncoder;
-    private final AuthRepository  userRepository;
-    
+    private final UsersRepository userRepository;
+
+    @Transactional(readOnly = true)
+    public boolean existsByUserId(String userId) {
+        boolean dupYn = userRepository.existsByUserId(userId);
+        return dupYn;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsByUserNm(String userNm) {
+        boolean dupYn = userRepository.existsByUserNm(userNm);
+        return dupYn;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsByEmail(String email) {
+        boolean dupYn = userRepository.existsByEmail(email);
+        return dupYn;
+    }
+
     @Transactional
     public void registerUser(UserDTO userDTO) {
         String encodedPassword = passwordEncoder.encode(userDTO.getPassword());

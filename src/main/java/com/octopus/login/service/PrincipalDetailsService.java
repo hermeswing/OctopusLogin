@@ -2,7 +2,7 @@ package com.octopus.login.service;
 
 import com.octopus.entity.Users;
 import com.octopus.login.dto.PrincipalDetails;
-import com.octopus.login.repository.AuthRepository;
+import com.octopus.login.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PrincipalDetailsService implements UserDetailsService {
 
-    private final AuthRepository authRepository;
+    private final UsersRepository authRepository;
 
     @Override
     public PrincipalDetails loadUserByUsername( String userId ) throws UsernameNotFoundException {

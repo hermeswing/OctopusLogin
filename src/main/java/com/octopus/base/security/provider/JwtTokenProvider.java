@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * <pre>
  * 토큰의 생성, 토큰의 유효성 검증 등을 담당
- * 출처 : https://velog.io/@gale4739/Spring-Security-%EC%A0%81%EC%9A%A9
+ * 출처 : <a href="https://velog.io/@gale4739/Spring-Security-%EC%A0%81%EC%9A%A9">...</a>
  * https://github.com/u-nij/Authentication-Using-JWT
  * </pre>
  *
