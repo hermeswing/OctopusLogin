@@ -1,5 +1,6 @@
 package com.octopus.login.service;
 
+import com.octopus.base.exception.ExUserNotFoundException;
 import com.octopus.entity.Users;
 import com.octopus.login.dto.PrincipalDetails;
 import com.octopus.login.repository.UsersRepository;
@@ -21,7 +22,7 @@ public class PrincipalDetailsService implements UserDetailsService {
     public PrincipalDetails loadUserByUsername( String userId ) throws UsernameNotFoundException {
         log.debug( "★★★★★★★★★★★★★★★★★" );
         Users findUser = authRepository.findByUserId( userId )
-                .orElseThrow( () -> new UsernameNotFoundException( "Can't find user with this User ID. -> " + userId ) );
+                .orElseThrow( () -> new ExUserNotFoundException( "Can't find user with this User ID. -> " + userId ) );
 
         log.debug( "findByEmail :: {}", findUser );
 

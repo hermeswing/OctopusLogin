@@ -107,10 +107,14 @@ public class ExceptionAdvice {
     }
 
     @ExceptionHandler( ExUserNotFoundException.class )
-    @ResponseStatus( HttpStatus.INTERNAL_SERVER_ERROR )
-    protected CommonResult userNotFoundException( HttpServletRequest request, ExUserNotFoundException e ) {
+    @ResponseStatus( HttpStatus.BAD_REQUEST )
+    protected ResponseEntity userNotFoundException( HttpServletRequest request, ExUserNotFoundException e ) {
         // 예외 처리의 메시지를 MessageSource에서 가져오도록 수정
-        return responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "userNotFound" ) );
+        // responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "userNotFound" ) );
+
+        log.info( "[duplicatedException] result :: {}", e.getMessage() );
+        CommonResult result = responseService.getFailResult( ResultCode.ERROR.getCode(), e.getMessage() );
+        return ResponseEntity.badRequest().body( result );
     }
 
     @ExceptionHandler( ExDuplicatedException.class )
