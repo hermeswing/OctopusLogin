@@ -7,8 +7,9 @@ import com.octopus.login.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 // UserDetailsService는 IoC로 찾음
 @Slf4j
@@ -16,17 +17,25 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PrincipalDetailsService implements UserDetailsService {
 
-    private final UsersRepository authRepository;
+    private final UsersRepository userRepository;
 
     @Override
-    public PrincipalDetails loadUserByUsername( String userId ) throws UsernameNotFoundException {
+    public PrincipalDetails loadUserByUsername( String userId ) {
         log.debug( "★★★★★★★★★★★★★★★★★" );
-        Users findUser = authRepository.findByUserId( userId )
-                .orElseThrow( () -> new ExUserNotFoundException( "Can't find user with this User ID. -> " + userId ) );
 
-        log.debug( "findByEmail :: {}", findUser );
+        boolean dupYn = userRepository.existsByUserId( userId );
 
-        return new PrincipalDetails( findUser );
+        log.debug( "dupYn :: {}", dupYn );
+
+        if( dupYn == false ) {
+            throw new ExUserNotFoundException( "Can't find user with this User ID. -> " + userId );
+        } else {
+            Optional<Users> findUser = userRepository.findByUserId( userId );
+
+            log.debug( "findUser :: {}", findUser.get() );
+
+            return new PrincipalDetails( findUser.get() );
+        }
     }
 
 }

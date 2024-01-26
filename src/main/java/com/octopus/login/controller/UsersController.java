@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 public class UsersController {
@@ -19,7 +21,7 @@ public class UsersController {
 
     // 회원가입
     @PostMapping("/signup")
-    public CommonResult signup( @RequestBody UserDTO userDTO) {
+    public CommonResult signup( @Valid @RequestBody UserDTO userDTO) {
         if( userService.existsByUserId(userDTO.getUserId()) ) {
             throw new ExDuplicatedException("중복된 사용자가 존재합니다.");
         } else {

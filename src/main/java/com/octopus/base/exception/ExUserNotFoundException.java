@@ -1,18 +1,17 @@
 package com.octopus.base.exception;
 
-public class ExUserNotFoundException extends RuntimeException {
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-	private static final long serialVersionUID = 1L;
+public class ExUserNotFoundException extends UsernameNotFoundException {
 
-	public ExUserNotFoundException( String msg, Throwable t) {
-		super(msg, t);
-	}
+    private static final long serialVersionUID = 1L;
 
-	public ExUserNotFoundException( String msg) {
-		super(msg);
-	}
+    public ExUserNotFoundException( String msg, Throwable t ) {
+        super( msg, t );
+    }
 
-	public ExUserNotFoundException() {
-		super();
-	}
+    public ExUserNotFoundException( String msg ) {
+        super( msg );
+    }
+
 }

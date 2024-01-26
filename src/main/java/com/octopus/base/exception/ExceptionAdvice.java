@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.InvalidResultSetAccessException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -60,14 +61,13 @@ public class ExceptionAdvice {
      * @Valid 에 의해 발생되는 Exception 메시지 처리
      */
     @ExceptionHandler( MethodArgumentNotValidException.class )
-    @ResponseStatus( HttpStatus.BAD_REQUEST )
-    public CommonResult methodArgumentNotValidException( MethodArgumentNotValidException e ) {
-
+    public ResponseEntity methodArgumentNotValidException( MethodArgumentNotValidException e ) {
         log.debug( "e.getBindingResult() :: {}", e.getBindingResult() );
 
         Map<String, String> errMsg = makeErrorResponse( e.getBindingResult() );
+        CommonResult result = responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "argumentException" ) + " :: [" + errMsg.get( "errorField" ) + "] :: " + errMsg.get( "description" ) );
+        return ResponseEntity.badRequest().body( result );
 
-        return responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "argumentException" ) + " :: [" + errMsg.get( "errorField" ) + "] :: " + errMsg.get( "description" ) );
     }
 
     /**
@@ -106,19 +106,24 @@ public class ExceptionAdvice {
         return responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "argumentException" ) );
     }
 
-    @ExceptionHandler( ExUserNotFoundException.class )
-    @ResponseStatus( HttpStatus.BAD_REQUEST )
-    protected ResponseEntity userNotFoundException( HttpServletRequest request, ExUserNotFoundException e ) {
+    /**
+     * <pre>
+     *    사용자 정보 조회 시 오류 발생.
+     *    String Security Authentication 오류
+     * </pre>
+     *
+     * @param bce String Security Authentication 오류
+     * @return ResponseEntity
+     */
+    @ExceptionHandler( BadCredentialsException.class )
+    protected ResponseEntity badCredentialsException( BadCredentialsException bce ) {
         // 예외 처리의 메시지를 MessageSource에서 가져오도록 수정
-        // responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "userNotFound" ) );
-
-        log.info( "[duplicatedException] result :: {}", e.getMessage() );
-        CommonResult result = responseService.getFailResult( ResultCode.ERROR.getCode(), e.getMessage() );
+        log.info( "[badCredentialsException] result :: {}", bce.getMessage() );
+        CommonResult result = responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "userNotFound" ) );
         return ResponseEntity.badRequest().body( result );
     }
 
     @ExceptionHandler( ExDuplicatedException.class )
-    @ResponseStatus( HttpStatus.BAD_REQUEST )
     protected ResponseEntity duplicatedException( HttpServletRequest request, ExDuplicatedException e ) {
 
         log.info( "[duplicatedException] result :: {}", e.getMessage() );
@@ -264,19 +269,16 @@ public class ExceptionAdvice {
         if( bindingResult.hasErrors() ) {
             // DTO에 설정한 meaasge값을 가져온다
             defaultMsg = bindingResult.getFieldError().getDefaultMessage();
-
-            log.debug( "defaultMsg :: {}", defaultMsg );
-
             errorField = bindingResult.getFieldError().getField();
-
-            log.debug( "errorField :: {}", errorField );
-
-            errMap.put( "errorField", errorField );
-
             // DTO에 유효성체크를 걸어놓은 어노테이션명을 가져온다.
             String bindResultCode = bindingResult.getFieldError().getCode();
 
+            log.debug( "defaultMsg :: {}", defaultMsg );
+            log.debug( "errorField :: {}", errorField );
             log.debug( "bindResultCode :: {}", bindResultCode );
+
+            errMap.put( "errorField", errorField );
+
 
             switch( bindResultCode ) {
                 case "NotNull":
@@ -289,6 +291,12 @@ public class ExceptionAdvice {
                     description = getMessage( "valid.max" );
                     break;
                 case "Size":
+                    description = defaultMsg;
+                    break;
+                case "Email":
+                    description = getMessage( "valid.email" );
+                    break;
+                case "Pattern":
                     description = defaultMsg;
                     break;
             }
