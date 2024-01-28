@@ -1,7 +1,6 @@
 package com.octopus.base.exception;
 
 import com.octopus.base.enumeration.ResultCode;
-import com.octopus.base.model.CommonResult;
 import com.octopus.base.service.ResponseManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,6 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DeadlockLoserDataAccessException;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.InvalidResultSetAccessException;
@@ -23,7 +21,6 @@ import org.springframework.security.authentication.InternalAuthenticationService
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.persistence.NonUniqueResultException;
@@ -41,32 +38,33 @@ public class ExceptionAdvice {
     private final MessageSourceAccessor messageSourceAccessor;
 
     /**
-     * @param e
-     * @return
-     * @Valid 에 의해 발생되는 Exception 메시지 처리
+     * 권한 Exception 메시지 처리
+     *
+     * @param e 권한 Exception
+     * @return ResponseEntity<?>
      */
     @ExceptionHandler( InternalAuthenticationServiceException.class )
-    @ResponseStatus( HttpStatus.BAD_REQUEST )
-    public CommonResult internalAuthenticationServiceException( InternalAuthenticationServiceException e ) {
+    public ResponseEntity<?> internalAuthServiceException( InternalAuthenticationServiceException e ) {
 
         log.debug( "e.getBindingResult() :: {}", e.getMessage() );
-        //log.debug("e.getBindingResult() :: {}", NonUniqueResultException);
 
-        return responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "중복된 데이터가 존재합니다.." ) );
+        return responseService.getBadRequest( ResultCode.ERROR.getCode(), getMessage( "권한 없음." ) );
     }
 
     /**
-     * @param e
-     * @return
-     * @Valid 에 의해 발생되는 Exception 메시지 처리
+     * <pre>
+     *     @Valid 에 의해 발생되는 Exception 메시지 처리
+     * </pre>
+     *
+     * @param e Method Argument 오류
+     * @return ResponseEntity<?>
      */
     @ExceptionHandler( MethodArgumentNotValidException.class )
-    public ResponseEntity methodArgumentNotValidException( MethodArgumentNotValidException e ) {
+    public ResponseEntity<?> methodArgumentNotValidException( MethodArgumentNotValidException e ) {
         log.debug( "e.getBindingResult() :: {}", e.getBindingResult() );
 
         Map<String, String> errMsg = makeErrorResponse( e.getBindingResult() );
-        CommonResult result = responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "argumentException" ) + " :: [" + errMsg.get( "errorField" ) + "] :: " + errMsg.get( "description" ) );
-        return ResponseEntity.badRequest().body( result );
+        return responseService.getBadRequest( ResultCode.ERROR.getCode(), getMessage( "argumentException" ) + " :: [" + errMsg.get( "errorField" ) + "] :: " + errMsg.get( "description" ) );
 
     }
 
@@ -80,12 +78,11 @@ public class ExceptionAdvice {
      * @return
      */
     @ExceptionHandler( IllegalArgumentException.class )
-    @ResponseStatus( HttpStatus.INTERNAL_SERVER_ERROR )
-    protected CommonResult argumentException( HttpServletRequest request, IllegalArgumentException e ) {
+    protected ResponseEntity<?> argumentException( HttpServletRequest request, IllegalArgumentException e ) {
 
         log.debug( "[ExceptionAdvice.argumentException] :: {}", e.toString() );
 
-        return responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "argumentException" ) );
+        return responseService.getErrorResult( ResultCode.ERROR.getCode(), getMessage( "argumentException" ) );
     }
 
     /**
@@ -93,17 +90,15 @@ public class ExceptionAdvice {
      * 객체 상태가 메서드 호출을 처리하기에 적절치 않을 때
      * </pre>
      *
-     * @param request
      * @param e
      * @return
      */
     @ExceptionHandler( IllegalStateException.class )
-    @ResponseStatus( HttpStatus.INTERNAL_SERVER_ERROR )
-    protected CommonResult illegalStateException( HttpServletRequest request, IllegalStateException e ) {
+    protected ResponseEntity<?> illegalStateException( IllegalStateException e ) {
 
         log.debug( "[ExceptionAdvice.illegalStateException] :: {}", e.toString() );
 
-        return responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "argumentException" ) );
+        return responseService.getErrorResult( ResultCode.ERROR.getCode(), getMessage( "argumentException" ) );
     }
 
     /**
@@ -116,30 +111,27 @@ public class ExceptionAdvice {
      * @return ResponseEntity
      */
     @ExceptionHandler( BadCredentialsException.class )
-    protected ResponseEntity badCredentialsException( BadCredentialsException bce ) {
+    protected ResponseEntity<?> badCredentialsException( BadCredentialsException bce ) {
         // 예외 처리의 메시지를 MessageSource에서 가져오도록 수정
         log.info( "[badCredentialsException] result :: {}", bce.getMessage() );
-        CommonResult result = responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "userNotFound" ) );
-        return ResponseEntity.badRequest().body( result );
+        return responseService.getBadRequest( ResultCode.ERROR.getCode(), getMessage( "userNotFound" ) );
     }
 
     @ExceptionHandler( ExDuplicatedException.class )
-    protected ResponseEntity duplicatedException( HttpServletRequest request, ExDuplicatedException e ) {
+    protected ResponseEntity<?> duplicatedException( HttpServletRequest request, ExDuplicatedException e ) {
 
         log.info( "[duplicatedException] result :: {}", e.getMessage() );
-        CommonResult result = responseService.getFailResult( ResultCode.ERROR.getCode(), e.getMessage() );
-        return ResponseEntity.badRequest().body( result );
+        return responseService.getBadRequest( ResultCode.ERROR.getCode(), e.getMessage() );
     }
 
     @ExceptionHandler( NonUniqueResultException.class )
-    @ResponseStatus( HttpStatus.INTERNAL_SERVER_ERROR )
-    protected CommonResult nonUniqueResultException( HttpServletRequest request, NonUniqueResultException nure ) {
+    protected ResponseEntity<?> nonUniqueResultException( HttpServletRequest request, NonUniqueResultException nure ) {
 
-        return responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "emailSignupFailed" ) );
+        return responseService.getErrorResult( ResultCode.ERROR.getCode(), getMessage( "emailSignupFailed" ) );
     }
 
     @ExceptionHandler( DataAccessException.class )
-    protected ResponseEntity dataAccessException( HttpServletRequest request, DataAccessException dae ) {
+    protected ResponseEntity<?> dataAccessException( HttpServletRequest request, DataAccessException dae ) {
 
         log.info( "[ExceptionAdvice >> dataAccessException] result :: {}", dae.getMessage() );
 
@@ -158,12 +150,13 @@ public class ExceptionAdvice {
         }
     */
     @ExceptionHandler( Exception.class )
-    @ResponseStatus( HttpStatus.INTERNAL_SERVER_ERROR )
-    protected CommonResult defaultException( HttpServletRequest request, Exception e ) {
+    protected ResponseEntity<?> defaultException( HttpServletRequest request, Exception e ) {
         log.info( "[ExceptionAdvice >> defaultException] getMessage :: {}", e.getMessage() );
-
+        if(e.getMessage() == null) {
+            e.printStackTrace();
+        }
         // 예외 처리의 메시지를 MessageSource에서 가져오도록 수정
-        return responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "unKnown" ) );
+        return responseService.getErrorResult( ResultCode.ERROR.getCode(), getMessage( "unKnown" ) );
     }
 
     // code정보에 해당하는 메시지를 조회합니다.
@@ -179,32 +172,28 @@ public class ExceptionAdvice {
     /**
      * Error Message 처리
      *
-     * @param ex
-     * @return
+     * @param ex DataAccessException
+     * @return ResponseEntity<?>
      */
-    private ResponseEntity getResponseEntity( DataAccessException ex ) {
-        // log.info("[DataAccessException >> getErrMsg] getMessage :: {}", ex.get);
-        log.info( "[DataAccessException >> getErrMsg] getMessage :: {}", ex.getMessage() );
-        CommonResult result = null;
+    private ResponseEntity<?> getResponseEntity( DataAccessException ex ) {
+        log.info( "[getResponseEntity >> getErrMsg] getMessage :: {}", ex.getMessage() );
 
         if( ex instanceof DataIntegrityViolationException ) {
             // 고유성 제한 위반과 같은 데이터 삽입 또는 업데이트시 무결성 위반
             // "등록된 데이터가 컬럼의 속성과 다릅니다. (길이, 속성, 필수입력항목 등..)"
-            result = responseService.getFailResult( ResultCode.ERROR.getCode(), getMessage( "duplicateKeyException" ) );
 
-            return ResponseEntity.badRequest().body( result );
+            return responseService.getBadRequest( ResultCode.ERROR.getCode(), getMessage("dataIntegrityViolationException") );
         } else {
-            result = responseService.getFailResult( ResultCode.ERROR.getCode(), ex.getMessage() );
 
-            return ResponseEntity.internalServerError().body( result );
+            return responseService.getErrorResult( ResultCode.ERROR.getCode(), ex.getMessage() );
         }
     }
 
     /**
      * Error Message 처리
      *
-     * @param ex
-     * @return
+     * @param ex DataAccessException
+     * @return Map<String, Object>
      */
     private Map<String, Object> getErrMsg( DataAccessException ex ) {
         int errCode = 0;

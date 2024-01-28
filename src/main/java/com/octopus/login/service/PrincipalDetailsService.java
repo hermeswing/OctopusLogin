@@ -23,18 +23,18 @@ public class PrincipalDetailsService implements UserDetailsService {
     public PrincipalDetails loadUserByUsername( String userId ) {
         log.debug( "★★★★★★★★★★★★★★★★★" );
 
-        boolean dupYn = userRepository.existsByUserId( userId );
+        boolean existsYn = userRepository.existsByUserId( userId );
 
-        log.debug( "dupYn :: {}", dupYn );
+        log.debug( "existsYn :: {}", existsYn );
 
-        if( dupYn == false ) {
-            throw new ExUserNotFoundException( "Can't find user with this User ID. -> " + userId );
-        } else {
+        if( existsYn ) {
             Optional<Users> findUser = userRepository.findByUserId( userId );
 
             log.debug( "findUser :: {}", findUser.get() );
 
             return new PrincipalDetails( findUser.get() );
+        } else {
+            throw new ExUserNotFoundException( "Can't find user with this User ID. -> " + userId );
         }
     }
 

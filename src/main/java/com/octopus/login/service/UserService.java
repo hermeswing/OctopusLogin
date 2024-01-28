@@ -13,9 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * <pre>
- * 출처 : https://velog.io/@u-nij/JWT-JWT-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0-4-Redis-%EC%84%A4%EC%A0%95RedisRepositoryConfig-RedisService
+ * 출처 : <a href="https://velog.io/@u-nij/JWT-JWT-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0-4-Redis-%EC%84%A4%EC%A0%95RedisRepositoryConfig-RedisService">...</a>
  * </pre>
- * 
+ *
  * @author jypark
  */
 @Slf4j
@@ -28,20 +28,17 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public boolean existsByUserId(String userId) {
-        boolean dupYn = userRepository.existsByUserId(userId);
-        return dupYn;
+        return userRepository.existsByUserId(userId);
     }
 
     @Transactional(readOnly = true)
     public boolean existsByUserNm(String userNm) {
-        boolean dupYn = userRepository.existsByUserNm(userNm);
-        return dupYn;
+        return userRepository.existsByUserNm(userNm);
     }
 
     @Transactional(readOnly = true)
     public boolean existsByEmail(String email) {
-        boolean dupYn = userRepository.existsByEmail(email);
-        return dupYn;
+        return userRepository.existsByEmail(email);
     }
 
     @Transactional
@@ -50,7 +47,9 @@ public class UserService {
         log.debug("encodedPassword :: {}", encodedPassword);
         
         Users users = Users.createEntiry(userDTO, encodedPassword);
-        
-        userRepository.save(users);
+
+        Users saveUsers = userRepository.save(users);
+
+        log.debug( "saveUsers :: {}", saveUsers );
     }
 }

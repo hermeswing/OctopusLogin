@@ -7,6 +7,7 @@ import com.octopus.base.model.ListResult;
 import com.octopus.base.model.SingleResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.MessageSourceAccessor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,6 +19,10 @@ public class ResponseManager {
     @Autowired
     private MessageSourceAccessor messageSourceAccessor;
 
+    /**
+     * @param queryParams
+     * @return
+     */
     // 쿼리 스트링 파라미터를 Map에 담아 반환
     public Map<String, Object> queryParamsToMap( final Object queryParams ) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -68,36 +73,44 @@ public class ResponseManager {
         return result;
     }
 
-    // 성공 결과만 처리하는 메소드
-    public CommonResult getSuccessResult( String message ) {
-        CommonResult result = new CommonResult();
-        result.setSuccess( true );
-        result.setCode( ResultCode.SUCCESS.getCode() );
-        result.setMsg( message );
-
-        return result;
-    }
-
     /**
-     * @Method : setSuccessResult
-     * @Description : 결과에 api 요청 성공 데이터 세팅
-     * @Parameter : [result]
-     * @Return : null
-     **/
+     * 성공 결과를 생성
+     *
+     * @param result
+     */
     public void setSuccessResult( CommonResult result ) {
         result.setSuccess( true );
         result.setCode( ResultCode.SUCCESS.getCode() );
         result.setMsg( messageSourceAccessor.getMessage( "msg.ok" ) ); // 정상처리되었습니다.
     }
 
+    // 성공 결과만 처리하는 메소드
+    public ResponseEntity getSuccessResult( String message ) {
+        CommonResult result = new CommonResult();
+        result.setSuccess( true );
+        result.setCode( ResultCode.SUCCESS.getCode() );
+        result.setMsg( message );
+
+        return ResponseEntity.ok().body( result );
+    }
+
     // 실패 결과만 처리하는 메소드
-    public CommonResult getFailResult( int code, String msg ) {
+    public ResponseEntity getBadRequest( int code, String msg ) {
         CommonResult result = new CommonResult();
         result.setSuccess( false );
         result.setCode( code );
         result.setMsg( msg );
 
-        return result;
+        return ResponseEntity.badRequest().body( result );
+    }
+
+    public ResponseEntity getErrorResult( int code, String msg ) {
+        CommonResult result = new CommonResult();
+        result.setSuccess( false );
+        result.setCode( code );
+        result.setMsg( msg );
+
+        return ResponseEntity.internalServerError().body( result );
     }
 
     /**
