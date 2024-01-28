@@ -14,8 +14,8 @@ import lombok.Getter;
 @Getter
 public enum ResultCode {
     ERROR(-1, "일반오류"),
-    WARNING(0, "주의"),
-    SUCCESS(1, "성공");
+    WARNING(1, "주의"),
+    SUCCESS(0, "성공");
     
     private final int code;
     private final String name;
