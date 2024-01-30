@@ -1,6 +1,7 @@
 package com.octopus.login.service;
 
 import com.octopus.base.exception.ExUserNotFoundException;
+import com.octopus.base.utils.MyThreadLocal;
 import com.octopus.entity.Users;
 import com.octopus.login.dto.PrincipalDetails;
 import com.octopus.login.repository.UsersRepository;
@@ -21,16 +22,12 @@ public class PrincipalDetailsService implements UserDetailsService {
 
     @Override
     public PrincipalDetails loadUserByUsername( String userId ) {
-        log.debug( "★★★★★★★★★★★★★★★★★" );
-
         boolean existsYn = userRepository.existsByUserId( userId );
-
-        log.debug( "existsYn :: {}", existsYn );
+        MyThreadLocal.setDevTrackingLog( "사용자는 존재해? :: " +  existsYn );
 
         if( existsYn ) {
             Optional<Users> findUser = userRepository.findByUserId( userId );
-
-            log.debug( "findUser :: {}", findUser.get() );
+            MyThreadLocal.setDevTrackingLog( "조회된 사용자 정보 :: " +  findUser.get() );
 
             return new PrincipalDetails( findUser.get() );
         } else {

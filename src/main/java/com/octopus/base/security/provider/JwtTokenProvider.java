@@ -2,6 +2,7 @@ package com.octopus.base.security.provider;
 
 import com.octopus.base.WebConst;
 import com.octopus.base.utils.DateUtils;
+import com.octopus.base.utils.MyThreadLocal;
 import com.octopus.login.dto.AuthDTO;
 import com.octopus.login.dto.PrincipalDetails;
 import com.octopus.login.service.PrincipalDetailsService;
@@ -70,6 +71,8 @@ public class JwtTokenProvider implements InitializingBean {
         byte[] keyBytes = Decoders.BASE64.decode( secretKey );
         this.signingKey = Keys.hmacShaKeyFor( keyBytes );
 
+        MyThreadLocal.setDevTrackingLog("[afterPropertiesSet] signingKey :: " + signingKey);
+
         log.debug( "[afterPropertiesSet] signingKey :: {}", signingKey );
     }
 
@@ -129,6 +132,10 @@ public class JwtTokenProvider implements InitializingBean {
 
         Long now = System.currentTimeMillis();
 
+        MyThreadLocal.setDevTrackingLog("email :: " + email);
+        MyThreadLocal.setDevTrackingLog("authorities :: " + authorities);
+        MyThreadLocal.setDevTrackingLog("signingKey :: " + signingKey);
+
         log.debug( "[createToken] email {}", email );
         log.debug( "[createToken] authorities {}", authorities );
         log.debug( "[createToken] now :: {}", now );
@@ -140,7 +147,7 @@ public class JwtTokenProvider implements InitializingBean {
                 .setExpiration( new Date( now + tokenValidityInMilliseconds ) )
                 .setSubject( "access-token" )
                 .claim( WebConst.URL, true )
-                .claim( WebConst.EMAIL_KEY, email )
+                .claim( WebConst.USER_ID, email )
                 .claim( WebConst.AUTHORITIES_KEY, authorities )
                 .signWith( signingKey, SignatureAlgorithm.HS512 )
                 .compact();
@@ -245,6 +252,7 @@ public class JwtTokenProvider implements InitializingBean {
     public Boolean isTokenExpired( String token ) {
         Date expiration = getClaims( token ).getExpiration();
 
+        MyThreadLocal.setDevTrackingLog("만료시간 :: " + DateUtils.getDateFormat( expiration ));
         log.debug( "만료시간 :: {}", DateUtils.getDateFormat( expiration ) );
 
         return expiration.before( new Date() );
@@ -255,7 +263,6 @@ public class JwtTokenProvider implements InitializingBean {
         try {
             log.debug( "signingKey :: {}", signingKey );
             log.debug( "isTokenExpired :: {}", isTokenExpired(accessToken) );
-
 
             String value = redisService.getValues( accessToken );
 

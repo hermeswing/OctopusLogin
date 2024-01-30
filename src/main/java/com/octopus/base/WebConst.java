@@ -2,12 +2,16 @@ package com.octopus.base;
 
 public interface WebConst {
     
+    String TRACKING_LOGGER = "trackingLog";
+
     String AUTHORIZATION_HEADER = "Authorization";
-    
+
     String AUTHORITIES_KEY = "role";
     
+    String USER_ID = "userId";
+
     String EMAIL_KEY = "email";
-    
+
     String URL = "https://localhost:7000";
     
     /** ---- URLs ---- * */

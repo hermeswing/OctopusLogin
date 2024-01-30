@@ -2,6 +2,7 @@ package com.octopus.base.security.filter;
 
 import com.octopus.base.WebConst;
 import com.octopus.base.security.provider.JwtTokenProvider;
+import com.octopus.base.utils.MyThreadLocal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,9 +49,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // resolveToken을 통해 토큰을 받아옴
         String accessToken = resolveToken(request);
-
         HttpServletRequest httpServletRequest = request;
         String requestURI = httpServletRequest.getRequestURI();
+
+        MyThreadLocal.setDevTrackingLog("requestURI :: " + requestURI);
+        MyThreadLocal.setDevTrackingLog("클라이언트에서 받아온 Token :: " + accessToken);
 
         log.debug("jwt : {}", accessToken);
         log.debug("requestURI : {}", requestURI);

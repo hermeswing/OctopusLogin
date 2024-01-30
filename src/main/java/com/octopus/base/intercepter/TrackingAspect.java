@@ -4,9 +4,11 @@ import com.octopus.base.utils.MyThreadLocal;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
@@ -25,18 +27,21 @@ import java.util.List;
  * 따라서 각 메서드 호출 시 클래스 이름이 로그에 출력됩니다.
  * </pre>
  */
+@Slf4j
 @Aspect
 @Component
-@Slf4j
 public class TrackingAspect {
 
     @Before( "execution(* com.octopus.*.controller.*.*(..))" )
     public void loggingBefore( JoinPoint joinPoint ) {
         //String className = joinPoint.getTarget().getClass().getSimpleName();
         MDC.put( "ThreadId", "ThreadId-" + Thread.currentThread().getId() );
+
+        MyThreadLocal.clearContext();
+
         MyThreadLocal.setContext( "startTime", System.currentTimeMillis() );
 
-        MyThreadLocal.setTrackingLog(joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName());
+        MyThreadLocal.setTrackingLog( joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName() );
 
         log.debug( "Transaction started for method >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " );
         log.debug( "Target().getClass(): {}", joinPoint.getTarget().getClass() );
@@ -58,17 +63,17 @@ public class TrackingAspect {
             return result;
         } finally {
             long duration = System.currentTimeMillis() - (Long) MyThreadLocal.getContext( "startTime" );
-            MyThreadLocal.setTrackingLog("실행시간 :: "+ duration + " ms");
+            MyThreadLocal.setTrackingLog( "실행시간 :: " + duration + " ms" );
             //log.info( "{}.{}({}) 실행 시간 : {} ms", joinPoint.getTarget().getClass().getSimpleName(), joinPoint.getSignature().getName(), Arrays.toString( joinPoint.getArgs() ), duration );
 
             StringBuffer trackingBuffer = new StringBuffer();
             trackingBuffer.append( "\n\n********************** My Tracking Logging **********************\n\n" );
             List<String> trackingList = MyThreadLocal.getTrackingList();
-            for (String element : trackingList) {
-                trackingBuffer.append(element + "\n");
+            for( String element : trackingList ) {
+                trackingBuffer.append( element + "\n" );
             }
 
-            log.debug(trackingBuffer.toString() + "\n");
+            log.debug( trackingBuffer.toString() + "\n" );
 
             //log.info( "Signature().getName() :: {}", joinPoint.getSignature().getName() );
             //log.debug( "Transaction completed for method: {}", joinPoint.getSignature().toLongString() + " >> Duration: " + duration + " ms" );
@@ -78,28 +83,43 @@ public class TrackingAspect {
         }
     }
 
-    @Around( "execution(* com.octopus.*.service.*.*(..))" )
-    public Object loggingServiceAround( ProceedingJoinPoint joinPoint ) throws Throwable {
-        try {
-            Object result = joinPoint.proceed();
-            return result;
-        } finally {
-            MyThreadLocal.setTrackingLog(joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName());
-            //log.info( "loggingServiceAround :: Signature().getName() :: {}", joinPoint.getSignature().getName() );
-            //log.debug( "loggingServiceAround :: Signature().toLongString() :: {}", joinPoint.getSignature().toLongString() );
-        }
+    @Before( "execution(* com.octopus.*.service.*.*(..))" )
+    public void loggingServiceBefore( JoinPoint joinPoint ) {
+        MyThreadLocal.setTrackingLog( joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName() );
     }
 
-    @Around( "execution(* com.octopus.*.repository.*.*(..))" )
-    public Object loggingRepositoryAround( ProceedingJoinPoint joinPoint ) throws Throwable {
-        try {
-            Object result = joinPoint.proceed();
-            return result;
-        } finally {
-            MyThreadLocal.setTrackingLog(joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName());
-            //log.info( "loggingRepositoryAround :: Signature().getName() :: {}", joinPoint.getSignature().getName() );
-            //log.debug( "loggingRepositoryAround :: Signature().toLongString() :: {}", joinPoint.getSignature().toLongString() );
-        }
+    @After( "execution(* com.octopus.*.service.*.*(..))" )
+    public void loggingServiceAfter( JoinPoint joinPoint ) {
+        //MyThreadLocal.setTrackingLog( joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName() );
+    }
+
+    @Before( "execution(* com.octopus.*.repository.*.*(..))" )
+    public void loggingRepositoryBefore( JoinPoint joinPoint ) {
+        MyThreadLocal.setTrackingLog( joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName() );
+    }
+
+    @After( "execution(* com.octopus.*.repository.*.*(..))" )
+    public void loggingRepositoryAfter( JoinPoint joinPoint ) {
+        //MyThreadLocal.setTrackingLog( joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName() );
+    }
+
+    // 특정 클래스를 대상으로 하는 Pointcut 정의
+    @Pointcut( "execution(* com.octopus.base.security.provider.JwtTokenProvider.*(..))" )
+    private void baseAspectPointcut() {
+    }
+
+    @Before("baseAspectPointcut()")
+    public void baseAspectPointcutBefore( JoinPoint joinPoint ) {
+        MyThreadLocal.setTrackingLog( joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName() );
+    }
+
+    @Pointcut( "execution(* com.octopus.base.security.filter.JwtFilter.*(..))" )
+    private void jwtFilterPointcut() {
+    }
+
+    @Before("jwtFilterPointcut()")
+    public void jwtFilterPointcutBefore( JoinPoint joinPoint ) {
+        MyThreadLocal.setTrackingLog( joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName() );
     }
 
 }

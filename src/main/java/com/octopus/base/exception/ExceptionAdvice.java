@@ -2,6 +2,7 @@ package com.octopus.base.exception;
 
 import com.octopus.base.enumeration.ResultCode;
 import com.octopus.base.service.ResponseManager;
+import com.octopus.base.utils.MyThreadLocal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -45,9 +46,7 @@ public class ExceptionAdvice {
      */
     @ExceptionHandler( InternalAuthenticationServiceException.class )
     public ResponseEntity<?> internalAuthServiceException( InternalAuthenticationServiceException e ) {
-
         log.debug( "e.getBindingResult() :: {}", e.getMessage() );
-
         return responseService.getBadRequest( ResultCode.ERROR.getCode(), getMessage( "권한 없음." ) );
     }
 

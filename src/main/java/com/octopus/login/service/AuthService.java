@@ -1,6 +1,7 @@
 package com.octopus.login.service;
 
 import com.octopus.base.security.provider.JwtTokenProvider;
+import com.octopus.base.utils.MyThreadLocal;
 import com.octopus.login.dto.AuthDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,15 +35,17 @@ public class AuthService {
      */
     @Transactional
     public AuthDTO.TokenDto login( AuthDTO.LoginDto loginDto ) {
-        log.debug( "★★★★★★★★★★★★★★★★★★ [login] ★★★★★★★★★★★★★★★★★" );
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken( loginDto.getUserId(),
                 loginDto.getPassword() );
-        log.debug( "<< 1 >>" );
-        Authentication authentication = authenticationManagerBuilder.getObject()
-                .authenticate( authenticationToken );
-        log.debug( "<< 2 >>" );
+        MyThreadLocal.setDevTrackingLog("[AuthService.login] UserId :: " + loginDto.getUserId());
+        MyThreadLocal.setDevTrackingLog("[AuthService.login] authenticationToken.getName() :: " + authenticationToken.getName());
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate( authenticationToken );
+        MyThreadLocal.setDevTrackingLog("[AuthService.login] 여기에서 사용자 정보를 조회하겠지....");
         SecurityContextHolder.getContext().setAuthentication( authentication );
-        log.debug( "<< 3 >>" );
+        MyThreadLocal.setDevTrackingLog("[AuthService.login] authentication.getName() :: " + authentication.getName());
+        MyThreadLocal.setDevTrackingLog("[AuthService.login] authentication.getPrincipal().toString() :: " + authentication.getPrincipal().toString());
+        MyThreadLocal.setDevTrackingLog("[AuthService.login] Redis 를 갔다왔고, Token 생성하러 간다.");
+
         return generateToken( SERVER, authentication.getName(), getAuthorities( authentication ) );
     }
 
