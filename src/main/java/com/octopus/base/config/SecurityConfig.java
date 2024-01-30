@@ -108,11 +108,11 @@ public class SecurityConfig {
                 // permitAll(): 인증 절차 없이 접근을 허용한다.
                 .and()
                 .authorizeHttpRequests() // '인증'이 필요하다
-                .antMatchers("/api/mypage/**").authenticated() // 마이페이지 인증 필요
-                .antMatchers("/api/admin/**").hasRole("ADMIN") // 관리자 페이지
                 .requestMatchers(new AntPathRequestMatcher("/login")).permitAll()
-                // .antMatchers("/**")
-                .anyRequest().permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/signup")).permitAll()
+                .antMatchers("/api/admin/**").hasRole("ADMIN") // 관리자 페이지
+                .antMatchers("/**").authenticated() // 마이페이지 인증 필요
+                //.anyRequest().permitAll()
                 .and()
                 // JwtFilter를 addFilterBefore로 등록했던 jwtSecurityConfig 클래스 적용
                 .headers()

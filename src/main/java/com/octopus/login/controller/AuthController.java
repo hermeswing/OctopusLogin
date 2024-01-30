@@ -69,7 +69,7 @@ public class AuthController {
     }
 
     @PostMapping( "/login2" )
-    public String getLoginToken( @RequestBody UserDTO loginRequestDTO ) {
+    public String getLoginToken( @RequestBody UserDTO.UserDto loginRequestDTO ) {
 
         log.debug( "Email :: {}", loginRequestDTO.getEmail() );
         log.debug( "Password :: {}", loginRequestDTO.getPassword() );

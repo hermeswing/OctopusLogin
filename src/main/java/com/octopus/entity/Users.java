@@ -1,5 +1,20 @@
 package com.octopus.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.octopus.base.enumeration.UserRole;
+import com.octopus.base.model.BaseEntity;
+import com.octopus.login.dto.UserDTO;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Proxy;
+import org.springframework.data.domain.Persistable;
+import org.springframework.util.Assert;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,23 +28,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
-
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Proxy;
-import org.springframework.data.domain.Persistable;
-import org.springframework.util.Assert;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.octopus.base.enumeration.UserRole;
-import com.octopus.base.model.BaseEntity;
-import com.octopus.login.dto.UserDTO;
-
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Getter // getter를 자동으로 생성합니다.
 // @Setter // 객체가 무분별하게 변경될 가능성 있음
@@ -112,7 +110,7 @@ public class Users extends BaseEntity implements Persistable<Long> {
         super.mdfId = mdfId;
     }
     
-    public static Users createEntiry(UserDTO userDTO, String encodedPassword) {
+    public static Users createEntiry(UserDTO.UserDto userDTO, String encodedPassword) {
         Users user = new Users();
         user.id       = userDTO.getId();
         user.userId   = userDTO.getUserId();
@@ -130,7 +128,7 @@ public class Users extends BaseEntity implements Persistable<Long> {
     /**
      * 사용자 정보 Update
      */
-    public void updateComment(UserDTO dto) {
+    public void updateComment(UserDTO.UserDto dto) {
         this.userId   = dto.getUserId();
         this.userNm   = dto.getUserNm();
         this.email    = dto.getEmail();

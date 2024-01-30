@@ -23,7 +23,7 @@ public class MyThreadLocal {
     public static void setTrackingLog( String path ) {
         // 현재 스레드의 데이터를 가져오거나 생성
         HashMap<String, Object> threadData = getThreadData();
-        log.debug( "threadData :: {}", threadData );
+        //log.debug( "threadData :: {}", threadData );
         if( threadData == null ) {
             threadData = new HashMap<>();
         }
@@ -58,7 +58,7 @@ public class MyThreadLocal {
     public static List<String> getTrackingList() {
         // 현재 스레드의 데이터를 가져오거나 생성
         HashMap<String, Object> threadData = getThreadData();
-        log.debug( "threadData :: {}", threadData );
+        //log.debug( "threadData :: {}", threadData );
         if( threadData == null ) {
             return null;
         } else {

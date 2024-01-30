@@ -1,15 +1,13 @@
 package com.octopus.base.model;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import lombok.Data;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import lombok.Data;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * <pre>
@@ -18,7 +16,8 @@ import lombok.Data;
 @Data
 @MappedSuperclass // BaseEntity를 상속한 Entity들은 아래의 필드들을 컬럼으로 인식한다.
 @EntityListeners(AuditingEntityListener.class) // Audting(자동으로 값 Mapping) 기능 추가
-public class BaseDTO implements Serializable {
+public class
+BaseDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     
     protected String        crtId; // 생성자

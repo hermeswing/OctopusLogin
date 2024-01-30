@@ -1,6 +1,13 @@
+##############################################################
 # Server port
+# server.tomcat.threads.min-spare : 톰캣워커 스레드풀의 최소값을 설정한다.
+# server.tomcat.threads.max : 톰캣 워커 스레드 풀의 최대값을 설정한다.
 server:
   port: 7000
+  tomcat:
+    threads:
+      min-spare: 100
+      max: 100
 
 ##############################################################
 # Spring Message 처리

@@ -1,12 +1,12 @@
 package com.octopus.login.service;
 
-import java.util.concurrent.TimeUnit;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.RequiredArgsConstructor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <pre>
@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
  * 
  * @author jypark
  */
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -34,6 +35,7 @@ public class RedisService {
     }
     
     public String getValues(String key) {
+        log.debug("key :: {}", key);
         return redisTemplate.opsForValue().get(key);
     }
     

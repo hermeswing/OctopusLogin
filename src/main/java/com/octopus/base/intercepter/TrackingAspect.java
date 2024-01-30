@@ -10,7 +10,6 @@ import org.aspectj.lang.annotation.Before;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -62,10 +61,15 @@ public class TrackingAspect {
             MyThreadLocal.setTrackingLog("실행시간 :: "+ duration + " ms");
             //log.info( "{}.{}({}) 실행 시간 : {} ms", joinPoint.getTarget().getClass().getSimpleName(), joinPoint.getSignature().getName(), Arrays.toString( joinPoint.getArgs() ), duration );
 
+            StringBuffer trackingBuffer = new StringBuffer();
+            trackingBuffer.append( "\n\n********************** My Tracking Logging **********************\n\n" );
             List<String> trackingList = MyThreadLocal.getTrackingList();
             for (String element : trackingList) {
-                log.debug(element);
+                trackingBuffer.append(element + "\n");
             }
+
+            log.debug(trackingBuffer.toString() + "\n");
+
             //log.info( "Signature().getName() :: {}", joinPoint.getSignature().getName() );
             //log.debug( "Transaction completed for method: {}", joinPoint.getSignature().toLongString() + " >> Duration: " + duration + " ms" );
 

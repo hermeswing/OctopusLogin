@@ -47,12 +47,21 @@ public class ResponseManager {
     }
 
     // 다중건 결과를 처리하는 메소드
-    public <T> ListResult<T> getListResult( List<T> list ) {
+    //public <T> ListResult<T> getListResult( List<T> list ) {
+    //    ListResult<T> result = new ListResult<>();
+    //    result.setList( list );
+    //    setSuccessResult( result );
+    //
+    //    return result;
+    //}
+    
+    // 다중건 결과를 처리하는 메소드
+    public <T> ResponseEntity getListResult( List<T> list ) {
         ListResult<T> result = new ListResult<>();
         result.setList( list );
         setSuccessResult( result );
 
-        return result;
+        return ResponseEntity.ok().body( result );
     }
 
     // HATEOAS를 적용한 다중건 결과를 처리하는 메소드
