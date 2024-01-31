@@ -15,19 +15,6 @@ public class MyThreadLocal {
         // private 생성자로 외부에서 직접 인스턴스 생성을 방지
     }
 
-    // 실제 싱글톤 인스턴스를 보유하는 정적 내부 클래스
-    private static class Holder {
-        private static final MyThreadLocal INSTANCE = new MyThreadLocal();
-    }
-
-    private void setAttribute( String key, Object value ) {
-        threadLocal.get().put( key, value );
-    }
-
-    private Object getAttribute( String key ) {
-        return threadLocal.get().get( key );
-    }
-
     public static MyThreadLocal getInstance() {
         return Holder.INSTANCE;
     }
@@ -75,12 +62,36 @@ public class MyThreadLocal {
         return (List<String>) threadLocal.get().get( WebConst.TRACKING_LOGGER );
     }
 
+    public static void clearContext() {
+        log.info( "ThreadLocal 이 삭제되었습니다." );
+        threadLocal.remove();
+    }
+
+    public static void printStackLog() {
+        StringBuilder logBuilder = new StringBuilder();
+        logBuilder.append( "\n\n********************** " + getContext( WebConst.THREAD_ID ) + " Tracking Logging **********************\n\n" );
+        List<String> trackingList = MyThreadLocal.getTrackingList();
+        for( String element : trackingList ) {
+            logBuilder.append( element + "\n" );
+        }
+
+        log.debug( logBuilder.toString() + "\n" );
+    }
+
+    private void setAttribute( String key, Object value ) {
+        threadLocal.get().put( key, value );
+    }
+
+    private Object getAttribute( String key ) {
+        return threadLocal.get().get( key );
+    }
+
     private void removeAttribute( String key ) {
         threadLocal.get().remove( key );
     }
 
-    public static void clearContext() {
-        log.info("ThreadLocal 이 삭제되었습니다.");
-        threadLocal.remove();
+    // 실제 싱글톤 인스턴스를 보유하는 정적 내부 클래스
+    private static class Holder {
+        private static final MyThreadLocal INSTANCE = new MyThreadLocal();
     }
 }

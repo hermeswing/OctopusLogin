@@ -118,8 +118,9 @@ public class ExceptionAdvice {
 
     @ExceptionHandler( ExDuplicatedException.class )
     protected ResponseEntity<?> duplicatedException( HttpServletRequest request, ExDuplicatedException e ) {
+        String message = "[ExDuplicatedException] " + e.getMessage();
+        printStackTrace(message);
 
-        log.info( "[duplicatedException] result :: {}", e.getMessage() );
         return responseService.getBadRequest( ResultCode.ERROR.getCode(), e.getMessage() );
     }
 
@@ -151,7 +152,7 @@ public class ExceptionAdvice {
     @ExceptionHandler( Exception.class )
     protected ResponseEntity<?> defaultException( HttpServletRequest request, Exception e ) {
         log.info( "[ExceptionAdvice >> defaultException] getMessage :: {}", e.getMessage() );
-        if(e.getMessage() == null) {
+        if( e.getMessage() == null ) {
             e.printStackTrace();
         }
         // 예외 처리의 메시지를 MessageSource에서 가져오도록 수정
@@ -181,7 +182,7 @@ public class ExceptionAdvice {
             // 고유성 제한 위반과 같은 데이터 삽입 또는 업데이트시 무결성 위반
             // "등록된 데이터가 컬럼의 속성과 다릅니다. (길이, 속성, 필수입력항목 등..)"
 
-            return responseService.getBadRequest( ResultCode.ERROR.getCode(), getMessage("dataIntegrityViolationException") );
+            return responseService.getBadRequest( ResultCode.ERROR.getCode(), getMessage( "dataIntegrityViolationException" ) );
         } else {
 
             return responseService.getErrorResult( ResultCode.ERROR.getCode(), ex.getMessage() );
@@ -293,5 +294,16 @@ public class ExceptionAdvice {
         errMap.put( "description", description );
 
         return errMap;
+    }
+
+    /**
+     * <pre>
+     *     ThreadLocal 의 Stacking 로그를 출력한다.
+     * </pre>
+     * @param message 정재된 오류메시지
+     */
+    private void printStackTrace(String message) {
+        MyThreadLocal.setTrackingLog( "[Exception] " + this.getClass().getName() + " >> " + message);
+        MyThreadLocal.printStackLog();
     }
 }
