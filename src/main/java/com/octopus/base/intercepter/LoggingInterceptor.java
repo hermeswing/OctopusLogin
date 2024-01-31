@@ -9,8 +9,13 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * <pre>
+ *     AppConfig 클래스, loggingInterceptor 클래스 등이 한 세트임.
+ * </pre>
+ */
 @Slf4j
-public abstract class BaseHandlerInterceptor implements HandlerInterceptor {
+public class LoggingInterceptor implements HandlerInterceptor {
 
     /**
      * <pre>
@@ -24,13 +29,11 @@ public abstract class BaseHandlerInterceptor implements HandlerInterceptor {
      * @throws Exception
      */
     @Override
-    public boolean preHandle( HttpServletRequest request, HttpServletResponse response, Object handler )
-            throws Exception {
-        // Controller 진입 전
-        log.debug( "===============================================" );
-        log.debug( "==================== BEGIN ====================" );
-        log.debug( "Request URI ===> " + request.getRequestURI() );
-        return HandlerInterceptor.super.preHandle( request, response, handler );
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        // 요청이 컨트롤러에 도달하기 전에 호출되는 메서드
+        String className = handler.getClass().getName();
+        System.out.println("Pre Handle: " + className);
+        return true; // true를 반환하면 컨트롤러 실행, false를 반환하면 실행 중단
     }
 
     /**
@@ -46,19 +49,19 @@ public abstract class BaseHandlerInterceptor implements HandlerInterceptor {
      * @throws Exception
      */
     @Override
-    public void postHandle( HttpServletRequest request, HttpServletResponse response, Object handler,
-                            ModelAndView modelAndView ) throws Exception {
-        // Controller 처리 후
-        log.debug( "==================== END ======================" );
-        log.debug( "===============================================" );
-        HandlerInterceptor.super.postHandle( request, response, handler, modelAndView );
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
+        // 컨트롤러의 처리가 끝난 후, 뷰가 렌더링되기 전에 호출되는 메서드
+        String className = handler.getClass().getName();
+        System.out.println("Post Handle: " + className);
     }
 
     @Override
-    public void afterCompletion( HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex )
-            throws Exception {
-        // 처리완료 후
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        // 뷰의 렌더링이 완료된 후 호출되는 메서드
+        String className = handler.getClass().getName();
+        System.out.println("After Completion: " + className);
     }
+
 
     /**
      * Rest Controller인지 여부를 나타내는 값을 반환

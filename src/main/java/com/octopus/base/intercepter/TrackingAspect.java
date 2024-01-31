@@ -40,10 +40,15 @@ public class TrackingAspect {
         // ThreadLocal 을 초기화 한다.
         MyThreadLocal.clearContext();
 
+        // 호출된 메서드의 클래스와 메서드 이름을 가져오기
+        //String className = joinPoint.getSignature().getDeclaringTypeName();
+        //String methodName = joinPoint.getSignature().getName();
+
         MyThreadLocal.setContext( WebConst.THREAD_ID, threadId );
         MyThreadLocal.setContext( WebConst.START_TIME, System.currentTimeMillis() );
+
         //MyThreadLocal.setTrackingLog( joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName() );
-        MyThreadLocal.setTrackingLog( "[Controller] " + joinPoint.getSignature().toLongString() );
+        MyThreadLocal.setTrackingLog( "[Controller Call] " + joinPoint.getSignature().toLongString() );
 
         //log.debug( "Transaction started for method >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " );
         //log.debug( "Target().getClass(): {}", joinPoint.getTarget().getClass() );
@@ -64,6 +69,8 @@ public class TrackingAspect {
             Object result = joinPoint.proceed();
             return result;
         } finally {
+            MyThreadLocal.setTrackingLog( "[Controller Release] " + joinPoint.getSignature().toLongString() );
+
             long duration = System.currentTimeMillis() - (Long) MyThreadLocal.getContext( WebConst.START_TIME );
             MyThreadLocal.setTrackingLog( "실행시간 :: " + duration + " ms" );
             //log.info( "{}.{}({}) 실행 시간 : {} ms", joinPoint.getTarget().getClass().getSimpleName(), joinPoint.getSignature().getName(), Arrays.toString( joinPoint.getArgs() ), duration );
@@ -80,22 +87,41 @@ public class TrackingAspect {
 
     @Before( "execution(* com.octopus.*.service.*.*(..))" )
     public void loggingServiceBefore( JoinPoint joinPoint ) {
-        MyThreadLocal.setTrackingLog( "[Service] " + joinPoint.getSignature().toLongString() );
+
+        // 호출된 메서드가 속한 클래스를 가져오기
+        Class<?> declaringType = joinPoint.getSignature().getDeclaringType();
+        String calledClassName = declaringType.getName();
+
+        // 호출된 메서드를 호출한 객체(또는 프락시 객체)를 가져오기
+        Object callerObject = joinPoint.getThis();
+
+        // 호출한 객체의 클래스를 가져오기
+        Class<?> callerClass = callerObject.getClass();
+        String callerClassName = callerClass.getName();
+
+        // 호출된 메서드의 클래스와 메서드 이름을 가져오기
+        String methodName = joinPoint.getSignature().getName();
+
+        MyThreadLocal.setTrackingLog( "[Before Service Call] " + callerClassName + "." + methodName);
+
+        MyThreadLocal.setTrackingLog( "[Service Call] " + joinPoint.getSignature().toLongString() );
     }
 
     @After( "execution(* com.octopus.*.service.*.*(..))" )
     public void loggingServiceAfter( JoinPoint joinPoint ) {
         //MyThreadLocal.setTrackingLog( joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName() );
+        MyThreadLocal.setTrackingLog( "[Service Release] " + joinPoint.getSignature().toLongString() );
     }
 
     @Before( "execution(* com.octopus.*.repository.*.*(..))" )
     public void loggingRepositoryBefore( JoinPoint joinPoint ) {
-        MyThreadLocal.setTrackingLog( "[Repository] " + joinPoint.getSignature().toLongString() );
+        MyThreadLocal.setTrackingLog( "[Repository Call] " + joinPoint.getSignature().toLongString() );
     }
 
     @After( "execution(* com.octopus.*.repository.*.*(..))" )
     public void loggingRepositoryAfter( JoinPoint joinPoint ) {
         //MyThreadLocal.setTrackingLog( joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName() );
+        MyThreadLocal.setTrackingLog( "[Repository Release] " + joinPoint.getSignature().toLongString() );
     }
 
     // 특정 클래스를 대상으로 하는 Pointcut 정의
