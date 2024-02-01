@@ -70,12 +70,12 @@ logging:
     root : INFO
     octopus: DEBUG
     org:
-      #hibernate:
-      #  type:
-      #    descriptor:
-      #      sql:
-      #        BasicBinder: INFO
-      #  SQL: INFO
+      hibernate:
+        type:
+          descriptor:
+            sql:
+              BasicBinder: INFO              # TRACE org.hibernate.type.descriptor.sql.BasicBinder.bind 로그를 지웁니다.
+        SQL: INFO                            # DEBUG              org.hibernate.SQL.logStatement 를 지웁니다.
       springframework: INFO
   pattern:
     console: "%-5level %d{yy-MM-dd HH:mm:SSS}[%thread] %boldMagenta([▶ %logger.%method ◀])[%line]: - %msg%n"
