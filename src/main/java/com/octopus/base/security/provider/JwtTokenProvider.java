@@ -67,11 +67,12 @@ public class JwtTokenProvider implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         log.debug( "★★★★★★★★★★★★★★★★★★ [JwtTokenProvider.afterPropertiesSet] ★★★★★★★★★★★★★★★★★" );
+        MyThreadLocal.setTrackingLog("[Provider] " + this.getClass().getName() + ".afterPropertiesSet()");
 
         byte[] keyBytes = Decoders.BASE64.decode( secretKey );
         this.signingKey = Keys.hmacShaKeyFor( keyBytes );
 
-        MyThreadLocal.setDevTrackingLog("[afterPropertiesSet] signingKey :: " + signingKey);
+        //MyThreadLocal.setDevTrackingLog("[afterPropertiesSet] signingKey :: " + signingKey);
 
         log.debug( "[afterPropertiesSet] signingKey :: {}", signingKey );
     }
@@ -122,24 +123,25 @@ public class JwtTokenProvider implements InitializingBean {
     }
 
     /**
-     * @param email       사용자 Key ( USER_ID, EMAIL 등등 )
+     * @param userId       사용자 Key ( USER_ID, EMAIL 등등 )
      * @param authorities 사용자 권한 ( ROLE_ADMIN, ROLE_USER 등등 )
      * @return AuthDTO.TokenDto 생성된 Token 정보
      */
     // @Transactional
-    public AuthDTO.TokenDto createToken( String email, String authorities ) {
+    public AuthDTO.TokenDto createToken( String userId, String authorities ) {
+        MyThreadLocal.setTrackingLog("[Provider] " + this.getClass().getName() + ".createToken(userId, authorities)");
         log.debug( "★★★★★★★★★★★★★★★★★★ [JwtTokenProvider.createToken] ★★★★★★★★★★★★★★★★★" );
 
         Long now = System.currentTimeMillis();
 
-        MyThreadLocal.setDevTrackingLog("email :: " + email);
-        MyThreadLocal.setDevTrackingLog("authorities :: " + authorities);
-        MyThreadLocal.setDevTrackingLog("signingKey :: " + signingKey);
+        MyThreadLocal.setDevTrackingLog("userId :: " + userId);
+        //MyThreadLocal.setDevTrackingLog("authorities :: " + authorities);
+        //MyThreadLocal.setDevTrackingLog("signingKey :: " + signingKey);
 
-        log.debug( "[createToken] email {}", email );
+        log.debug( "[createToken] userId {}", userId );
         log.debug( "[createToken] authorities {}", authorities );
         log.debug( "[createToken] now :: {}", now );
-        log.debug( "[createToken] signingKey :: {}", signingKey );
+        //log.debug( "[createToken] signingKey :: {}", signingKey );
 
         String accessToken = Jwts.builder()
                 .setHeaderParam( "typ", "JWT" )
@@ -147,7 +149,7 @@ public class JwtTokenProvider implements InitializingBean {
                 .setExpiration( new Date( now + tokenValidityInMilliseconds ) )
                 .setSubject( "access-token" )
                 .claim( WebConst.URL, true )
-                .claim( WebConst.USER_ID, email )
+                .claim( WebConst.USER_ID, userId )
                 .claim( WebConst.AUTHORITIES_KEY, authorities )
                 .signWith( signingKey, SignatureAlgorithm.HS512 )
                 .compact();
@@ -185,8 +187,8 @@ public class JwtTokenProvider implements InitializingBean {
     // }
 
     public Authentication getAuthentication( String token ) {
-        String email = getClaims( token ).get( WebConst.EMAIL_KEY ).toString();
-        PrincipalDetails principal = userDetailsService.loadUserByUsername( email );
+        String userId = getClaims( token ).get( WebConst.USER_ID ).toString();
+        PrincipalDetails principal = userDetailsService.loadUserByUsername( userId );
         return new UsernamePasswordAuthenticationToken( principal, "", principal.getAuthorities() );
     }
 
@@ -205,6 +207,10 @@ public class JwtTokenProvider implements InitializingBean {
             e.printStackTrace();
             throw new InvalidParameterException( "유효하지 않은 토큰입니다" );
         }
+    }
+
+    public String getClaimsValue( String token, String key ) {
+        return getClaims(token).get( key ).toString();
     }
 
     public long getTokenExpirationTime( String token ) {
@@ -261,10 +267,12 @@ public class JwtTokenProvider implements InitializingBean {
     // Filter에서 사용
     public boolean validateAccessToken( String accessToken ) {
         try {
-            log.debug( "signingKey :: {}", signingKey );
+            //log.debug( "signingKey.getAlgorithm() :: {}", signingKey.getAlgorithm() );
+            //log.debug( "signingKey.getEncoded() :: {}", signingKey.getEncoded() );
             log.debug( "isTokenExpired :: {}", isTokenExpired(accessToken) );
-
-            String value = redisService.getValues( accessToken );
+            String userId = getClaimsValue( accessToken, WebConst.USER_ID );
+            //String value = redisService.getValues( accessToken );
+            String value = redisService.getValues( "RT(" + WebConst.SERVER + "):" + userId  );
 
             log.debug( "value :: {}", value );
 
@@ -272,10 +280,12 @@ public class JwtTokenProvider implements InitializingBean {
                     && value.equals( "logout" ) ) { // 로그아웃 했을 경우
                 return false;
             }
+
             Jwts.parserBuilder()
                     .setSigningKey( signingKey )
                     .build()
                     .parseClaimsJws( accessToken );
+
             return true;
         } catch( ExpiredJwtException e ) {
             return true;

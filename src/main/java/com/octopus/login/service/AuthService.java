@@ -1,5 +1,6 @@
 package com.octopus.login.service;
 
+import com.octopus.base.WebConst;
 import com.octopus.base.security.provider.JwtTokenProvider;
 import com.octopus.base.utils.MyThreadLocal;
 import com.octopus.login.dto.AuthDTO;
@@ -26,8 +27,6 @@ public class AuthService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RedisService redisService;
 
-    private final String SERVER = "Server";
-
     /**
      * <pre>
      * 로그인: 인증 정보 저장 및 비어 토큰 발급
@@ -46,7 +45,9 @@ public class AuthService {
         MyThreadLocal.setDevTrackingLog("[AuthService.login] authentication.getPrincipal().toString() :: " + authentication.getPrincipal().toString());
         MyThreadLocal.setDevTrackingLog("[AuthService.login] Redis 를 갔다왔고, Token 생성하러 간다.");
 
-        return generateToken( SERVER, authentication.getName(), getAuthorities( authentication ) );
+        // TODO authentication.getName() 는 왜??? email 을 반환할까??
+        //return generateToken( WebConst.SERVER, authentication.getName(), getAuthorities( authentication ) );
+        return generateToken( WebConst.SERVER, authenticationToken.getName(), getAuthorities( authentication ) );
     }
 
     // AT가 만료일자만 초과한 유효한 토큰인지 검사
@@ -64,14 +65,14 @@ public class AuthService {
         Authentication authentication = jwtTokenProvider.getAuthentication( requestAccessToken );
         String principal = getPrincipal( requestAccessToken );
 
-        String refreshTokenInRedis = redisService.getValues( "RT(" + SERVER + "):" + principal );
+        String refreshTokenInRedis = redisService.getValues( "RT(" + WebConst.SERVER + "):" + principal );
         if( refreshTokenInRedis == null ) { // Redis에 저장되어 있는 RT가 없을 경우
             return null; // -> 재로그인 요청
         }
 
         // 요청된 RT의 유효성 검사 & Redis에 저장되어 있는 RT와 같은지 비교
         if( !jwtTokenProvider.validateRefreshToken( requestRefreshToken ) || !refreshTokenInRedis.equals( requestRefreshToken ) ) {
-            redisService.deleteValues( "RT(" + SERVER + "):" + principal ); // 탈취 가능성 -> 삭제
+            redisService.deleteValues( "RT(" + WebConst.SERVER + "):" + principal ); // 탈취 가능성 -> 삭제
             return null; // -> 재로그인 요청
         }
 
@@ -79,27 +80,28 @@ public class AuthService {
         String authorities = getAuthorities( authentication );
 
         // 토큰 재발급 및 Redis 업데이트
-        redisService.deleteValues( "RT(" + SERVER + "):" + principal ); // 기존 RT 삭제
+        redisService.deleteValues( "RT(" + WebConst.SERVER + "):" + principal ); // 기존 RT 삭제
         AuthDTO.TokenDto tokenDto = jwtTokenProvider.createToken( principal, authorities );
-        saveRefreshToken( SERVER, principal, tokenDto.getRefreshToken() );
+        saveRefreshToken( WebConst.SERVER, principal, tokenDto.getRefreshToken() );
         return tokenDto;
     }
 
     // 토큰 발급
     @Transactional
-    public AuthDTO.TokenDto generateToken( String provider, String email, String authorities ) {
+    public AuthDTO.TokenDto generateToken( String provider, String userId, String authorities ) {
         log.debug( "provider :: {}", provider );
-        log.debug( "email :: {}", email );
+        log.debug( "userId :: {}", userId );
         log.debug( "authorities :: {}", authorities );
+        log.debug( "Redis Key :: {}", "RT(" + provider + "):" + userId );
 
         // RT가 이미 있을 경우
-        if( redisService.getValues( "RT(" + provider + "):" + email ) != null ) {
-            redisService.deleteValues( "RT(" + provider + "):" + email ); // 삭제
+        if( redisService.getValues( "RT(" + provider + "):" + userId ) != null ) {
+            redisService.deleteValues( "RT(" + provider + "):" + userId ); // 삭제
         }
 
         // AT, RT 생성 및 Redis에 RT 저장
-        AuthDTO.TokenDto tokenDto = jwtTokenProvider.createToken( email, authorities );
-        saveRefreshToken( provider, email, tokenDto.getRefreshToken() );
+        AuthDTO.TokenDto tokenDto = jwtTokenProvider.createToken( userId, authorities );
+        saveRefreshToken( provider, userId, tokenDto.getRefreshToken() );
         return tokenDto;
     }
 
@@ -138,9 +140,9 @@ public class AuthService {
         String principal = getPrincipal( requestAccessToken );
 
         // Redis에 저장되어 있는 RT 삭제
-        String refreshTokenInRedis = redisService.getValues( "RT(" + SERVER + "):" + principal );
+        String refreshTokenInRedis = redisService.getValues( "RT(" + WebConst.SERVER + "):" + principal );
         if( refreshTokenInRedis != null ) {
-            redisService.deleteValues( "RT(" + SERVER + "):" + principal );
+            redisService.deleteValues( "RT(" + WebConst.SERVER + "):" + principal );
         }
 
         // Redis에 로그아웃 처리한 AT 저장

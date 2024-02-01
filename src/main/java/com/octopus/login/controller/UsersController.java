@@ -5,6 +5,7 @@ import com.octopus.base.service.ResponseManager;
 import com.octopus.login.dto.UserDTO;
 import com.octopus.login.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class UsersController {
@@ -34,7 +36,9 @@ public class UsersController {
 
     @GetMapping( "/userList" )
     public ResponseEntity<?> userList( @Valid @RequestBody UserDTO.ParamDto paramDto ) {
-        if( !userService.existsByUserId( paramDto.getUserId() ) ) {
+        if( userService.existsByUserId( paramDto.getUserId() ) ) {
+            //List<UserDTO.UserDto> userList = userService.findAll( paramDto );
+            //log.debug("userList :: {}", userList);
             return responseService.getListResult( userService.findAll( paramDto ) );
         } else {
             return responseService.getSuccessResult( null );

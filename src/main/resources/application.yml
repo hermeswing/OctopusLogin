@@ -105,6 +105,6 @@ custom:
     header: Authorization
     secretKey: MySecretKeyABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ABCDE
     refresh-token-validity-in-seconds: 1209600000  # 14일
-    token-validity-in-seconds: 43200000            # 12시간 ( 3600000; // 1시간 )
-    #token-validity-in-seconds: 86400000           # 24시간
+    #token-validity-in-seconds: 43200000            # 12시간 ( 3600000; // 1시간 )
+    token-validity-in-seconds: 86400000            # 24시간
     cookie-expiration: 7776000000                  # 90일

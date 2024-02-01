@@ -23,7 +23,8 @@ public class PrincipalDetailsService implements UserDetailsService {
     @Override
     public PrincipalDetails loadUserByUsername( String userId ) {
         boolean existsYn = userRepository.existsByUserId( userId );
-        MyThreadLocal.setDevTrackingLog( "사용자는 존재해? :: " +  existsYn );
+        log.debug( "userId :: [" + userId + "] 사용자는 존재해? :: {}", existsYn );
+        MyThreadLocal.setDevTrackingLog( "userId :: [" + userId + "] 사용자는 존재해? :: " +  existsYn );
 
         if( existsYn ) {
             Optional<Users> findUser = userRepository.findByUserId( userId );

@@ -34,17 +34,11 @@ public class TrackingAspect {
     @Before( "execution(* com.octopus.*.controller.*.*(..))" )
     public void loggingBefore( JoinPoint joinPoint ) {
         //String className = joinPoint.getTarget().getClass().getSimpleName();
-        String threadId = "ThreadId-" + Thread.currentThread().getId();
-        MDC.put( WebConst.THREAD_ID, threadId );
-
-        // ThreadLocal 을 초기화 한다.
-        MyThreadLocal.clearContext();
 
         // 호출된 메서드의 클래스와 메서드 이름을 가져오기
         //String className = joinPoint.getSignature().getDeclaringTypeName();
         //String methodName = joinPoint.getSignature().getName();
 
-        MyThreadLocal.setContext( WebConst.THREAD_ID, threadId );
         MyThreadLocal.setContext( WebConst.START_TIME, System.currentTimeMillis() );
 
         //MyThreadLocal.setTrackingLog( joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName() );
@@ -87,23 +81,6 @@ public class TrackingAspect {
 
     @Before( "execution(* com.octopus.*.service.*.*(..))" )
     public void loggingServiceBefore( JoinPoint joinPoint ) {
-
-        // 호출된 메서드가 속한 클래스를 가져오기
-        Class<?> declaringType = joinPoint.getSignature().getDeclaringType();
-        String calledClassName = declaringType.getName();
-
-        // 호출된 메서드를 호출한 객체(또는 프락시 객체)를 가져오기
-        Object callerObject = joinPoint.getThis();
-
-        // 호출한 객체의 클래스를 가져오기
-        Class<?> callerClass = callerObject.getClass();
-        String callerClassName = callerClass.getName();
-
-        // 호출된 메서드의 클래스와 메서드 이름을 가져오기
-        String methodName = joinPoint.getSignature().getName();
-
-        MyThreadLocal.setTrackingLog( "[Before Service Call] " + callerClassName + "." + methodName);
-
         MyThreadLocal.setTrackingLog( "[Service Call] " + joinPoint.getSignature().toLongString() );
     }
 

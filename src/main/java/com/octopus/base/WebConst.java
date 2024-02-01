@@ -7,6 +7,7 @@ public interface WebConst {
     String TRACKING_LOGGER = "trackingLog";
 
     String AUTHORIZATION_HEADER = "Authorization";
+    String SERVER = "Server";
 
     String AUTHORITIES_KEY = "role";
     

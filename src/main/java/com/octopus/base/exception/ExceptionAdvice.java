@@ -116,6 +116,14 @@ public class ExceptionAdvice {
         return responseService.getBadRequest( ResultCode.ERROR.getCode(), getMessage( "userNotFound" ) );
     }
 
+    @ExceptionHandler( ExUserNotFoundException.class )
+    protected ResponseEntity<?> userNotFoundException( HttpServletRequest request, ExUserNotFoundException e ) {
+        String message = "[ExUserNotFoundException] " + e.getMessage();
+        printStackTrace(message);
+
+        return responseService.getBadRequest( ResultCode.ERROR.getCode(), e.getMessage() );
+    }
+
     @ExceptionHandler( ExDuplicatedException.class )
     protected ResponseEntity<?> duplicatedException( HttpServletRequest request, ExDuplicatedException e ) {
         String message = "[ExDuplicatedException] " + e.getMessage();

@@ -63,18 +63,18 @@ public class MyThreadLocal {
     }
 
     public static void clearContext() {
-        log.info( "ThreadLocal 이 삭제되었습니다." );
+        log.info( "ThreadLocal 을 초기화 합니다." );
         threadLocal.remove();
     }
 
     public static void printStackLog() {
         StringBuilder logBuilder = new StringBuilder();
-        logBuilder.append( "\n\n********************** " + getContext( WebConst.THREAD_ID ) + " Tracking Logging **********************\n\n" );
+        logBuilder.append( "\n\n********************** [ " + getContext( WebConst.THREAD_ID ) + " ] Tracking Logging 시작 **********************\n\n" );
         List<String> trackingList = MyThreadLocal.getTrackingList();
         for( String element : trackingList ) {
             logBuilder.append( element + "\n" );
         }
-
+        logBuilder.append( "\n********************** [ " + getContext( WebConst.THREAD_ID ) + " ] Tracking Logging 종료 **********************\n\n" );
         log.debug( logBuilder.toString() + "\n" );
     }
 

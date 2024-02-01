@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * <pre>
+ *     Spring MVC에서 제공하는 인터페이스로, 컨트롤러의 실행 전/후 및 완료 후에 특정 작업을 수행할 수 있습니다.
+ *     주로 요청의 전처리와 응답의 후처리에 사용
  *     AppConfig 클래스, loggingInterceptor 클래스 등이 한 세트임.
  * </pre>
  */
